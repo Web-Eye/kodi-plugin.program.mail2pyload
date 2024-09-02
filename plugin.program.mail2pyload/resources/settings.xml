@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings version="1">
+    <section id="plugin.program.mail2pyload">
+            <category id="imap_settings" label="30500">
+            <group id="1">
+                <setting id="imap_server" type="string" label="30501" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30501</heading>
+                    </control>
+                </setting>
+                <setting id="imap_port" type="integer" label="30521" help="">
+                    <default>993</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30521</heading>
+                    </control>
+                </setting>
+                <setting id="imap_username" type="string" label="30541" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30541</heading>
+                    </control>
+                </setting>
+                <setting id="imap_password" type="string" label="30561" help="">
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30561</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+                <setting id="imap_folder" type="string" label="30581" help="">
+                    <default>INBOX</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30581</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="mail_filter" label="30600">
+            <group id="1">
+                <setting id="hoster_whitelist" type="string" label="30601" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30601</heading>
+                    </control>
+                </setting>
+                <setting id="hoster_blacklist" type="string" label="30621" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30621</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+    </section>
+</settings>

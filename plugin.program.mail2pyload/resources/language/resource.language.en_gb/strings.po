@@ -1,0 +1,81 @@
+# Kodi Media Center language file
+# Addon Name: mail2pyload
+# Addon id: plugin.program.mail2pyload
+# Addon Provider: WebEye
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Kodi Translation Team\n"
+"Language-Team: German (http://www.transifex.com/projects/p/xbmc-addons/language/de/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgctxt "#30100"
+msgid "HOME"
+msgstr "Home"
+
+msgctxt "#30101"
+msgid "NEW_MAIL"
+msgstr "New Mail"
+
+msgctxt "#30102"
+msgid "PYLOAD_PACKAGE"
+msgstr "pyLoad Package"
+
+msgctxt "#30200"
+msgid "ERROR"
+msgstr "Error"
+
+msgctxt "#30201"
+msgid "IMAP_ERROR"
+msgstr "IMAP Error"
+
+msgctxt "#30202"
+msgid "IMAP_SERVER_NOT_REACHABLE"
+msgstr "IMAP Server not reachable"
+
+msgctxt "#30203"
+msgid "IMAP_SERVER_REFUSED"
+msgstr "No connection could be made because the target machine actively refused it."
+
+msgctxt "#30500"
+msgid "IMAP_SETTINGS"
+msgstr "IMAP Settings"
+
+msgctxt "#30501"
+msgid "IMAP_SERVER"
+msgstr "IMAP Server"
+
+msgctxt "#30521"
+msgid "IMAP_PORT"
+msgstr "IMAP Port"
+
+msgctxt "#30541"
+msgid "IMAP_USERNAME"
+msgstr "IMAP Username"
+
+msgctxt "#30561"
+msgid "IMAP_PASSWORD"
+msgstr "IMAP Password"
+
+msgctxt "#30581"
+msgid "IMAP_FOLDER"
+msgstr "IMAP Folder"
+
+msgctxt "#30600"
+msgid "MAIL_FILTER"
+msgstr "Mail Filter"
+
+msgctxt "#30601"
+msgid "HOSTER_WHITELIST"
+msgstr "Hoster Whitelist"
+
+msgctxt "#30621"
+msgid "HOSTER_BLACKLIST"
+msgstr "Hoster Blacklist"

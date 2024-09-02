@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon
+    id="plugin.program.mail2pyload"
+    version="1.0.1+beta"
+    name="mail2pyload"
+    provider-name="WebEye">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+
+  <extension point="xbmc.python.pluginsource" library="main.py">
+    <provides>executable</provides>
+  </extension>
+
+  <extension point="xbmc.addon.metadata">
+    <language>en</language>
+    <platform>all</platform>
+    <license>GPL-3.0-only</license>
+    <website>https://github.com/Web-Eye/kodi-plugin.program.mail2pyload</website>
+    <source>https://github.com/Web-Eye/kodi-plugin.program.mail2pyload</source>
+    <summary lang="de">[Kodi](https://kodi.tv/) plugin um ein IMAP Verzeichis auszulese, nach hosting links zu suchen und einem [pyLoad](https://pyload.net/) Paket hinzuzufügen.</summary>
+    <summary lang="en">[Kodi](https://kodi.tv/) plugin to readout a imap mail folder, parse for hosting links and add them to a [pyLoad](https://pyload.net/) package.</summary>
+    <disclaimer lang="en_GB">Use at your own risk. Post suggestions, improvements or bug reports directly to GitHub.</disclaimer>
+    <disclaimer lang="de_DE">Benutzung auf eigene Gefahr. Anregungen, Verbesserungen oder Bugs bitte direkt über GitHub posten.</disclaimer>
+    <assets>
+      <icon>resources/assets/icon.png</icon>
+      <fanart>resources/assets/fanart.png</fanart>
+      <screenshot>resources/assets/screenshot_1.png</screenshot>
+      <screenshot>resources/assets/screenshot_2.png</screenshot>
+      <screenshot>resources/assets/screenshot_3.png</screenshot>
+    </assets>
+    <news>
+    </news>
+  </extension>
+
+
+
+
+</addon>
