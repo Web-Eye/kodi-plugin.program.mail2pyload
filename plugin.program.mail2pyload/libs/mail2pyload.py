@@ -82,7 +82,21 @@ class mail2pyload:
         try:
 
             p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
-            p.getNewMails()
+            mails = p.getNewMails
+            for mail in mails:
+                print(mail['subject'])
+                print(mail['description'])
+                for i in mail['images']:
+                    print(i)
+
+                for p in mail['packages']:
+                    print(p['subject'])
+                    for h in p['hosters']:
+                        print(h['subject'] + ": " + h['link'])
+
+                print('________________________________________')
+
+
 
         except gaierror:
             self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_NOT_REACHABLE))
