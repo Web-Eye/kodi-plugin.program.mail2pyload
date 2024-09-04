@@ -49,7 +49,7 @@ class GuiManager:
         xbmcplugin.setContent(self._argv, content)
 
     def __setEntity(self, title, url, art, _property, _type, infolabels, isFolder):
-        li = xbmcgui.ListItem(str(title))
+        li = xbmcgui.ListItem(label=str(title))
         if art is not None:
             li.setArt(art)
 

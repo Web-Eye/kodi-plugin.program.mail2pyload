@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import base64
 import imaplib
+import json
 import sys
 import urllib
 import urllib.parse
@@ -71,8 +73,30 @@ class mail2pyload:
             page = 1
 
         {
-            'NEWMAIL': self.setMailView
+            'NEWMAIL': self.setMailView,
+            'MAILDETAIL': self.setMailDetailView
         }[param](page=page, tag=tag)
+
+    def setMailDetailView(self, **kwargs):
+        page = kwargs.get('page')
+        tag = kwargs.get('tag')
+
+        infoLabels = {
+            'Title': 'Test'
+        }
+
+        if not tag is None:
+            tag = self._base64Decode(tag)
+            mail = json.loads(tag)
+            for i in mail['images']:
+
+
+                tag = self._base64Encode(i)
+                url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(self._buildArgs(method='show', param='IMAGE', tag=tag))
+                # TODO: item is not playable
+                self._guiManager.addItem(title=mail['subject'],url=url,poster=i)
+
+
 
 
     def setMailView(self, **kwargs):
@@ -84,17 +108,34 @@ class mail2pyload:
             p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
             mails = p.getNewMails
             for mail in mails:
-                print(mail['subject'])
-                print(mail['description'])
-                for i in mail['images']:
-                    print(i)
+                poster = self._ICON
+                if len(mail['images']) > 0:
+                    poster=mail['images'][0]
 
-                for p in mail['packages']:
-                    print(p['subject'])
-                    for h in p['hosters']:
-                        print(h['subject'] + ": " + h['link'])
+                infoLabels = {
+                    'Title': mail['subject'],
+                    'Plot': mail['description']
+                }
 
-                print('________________________________________')
+                tag = json.dumps(mail)
+                tag = self._base64Encode(tag)
+
+                self._guiManager.addDirectory(title=mail['subject'], poster=poster, infoLabels=infoLabels,
+                                              args=self._buildArgs(method='list', param='MAILDETAIL', tag=tag))
+
+
+
+                # print(mail['subject'])
+                # print(mail['description'])
+                # for i in mail['images']:
+                #     print(i)
+                #
+                # for p in mail['packages']:
+                #     print(p['subject'])
+                #     for h in p['hosters']:
+                #         print(h['subject'] + ": " + h['link'])
+                #
+                # print('________________________________________')
 
 
 
@@ -105,6 +146,21 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
 
+
+    def showEntity(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        {
+            'IMAGE': self.showImage
+        }[param](tag=tag)
+
+
+    def showImage(self, **kwargs):
+        tag = kwargs.get('tag')
+        image = self._base64Decode(tag)
+
+        xbmc.executebuiltin('ShowPicture(%s)' % image)
 
     @staticmethod
     def _buildArgs(**kwargs):
@@ -133,6 +189,20 @@ class mail2pyload:
         return args
 
     @staticmethod
+    def _base64Encode(s):
+        b = s.encode("ascii")
+
+        encoded = base64.b64encode(b)
+        return encoded.decode("ascii")
+
+
+    @staticmethod
+    def _base64Decode(s):
+        b = s.encode("ascii")
+        decoded = base64.b64decode(b)
+        return decoded.decode("ascii")
+
+    @staticmethod
     def _get_query_args(s_args):
         args = urllib.parse.parse_qs(urllib.parse.urlparse(s_args).query)
 
@@ -154,7 +224,8 @@ class mail2pyload:
 
         {
             'home': self.setHomeView,
-            'list': self.setListView
+            'list': self.setListView,
+            'show': self.showEntity
         }[method](param=param, page=page, tag=tag, navigation=navigation)
 
         self._guiManager.endOfDirectory()

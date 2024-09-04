@@ -55,7 +55,7 @@ class mailParser:
                     subject = str(make_header(decode_header(message['subject'])))
 
                     item = {
-                        'uid': uid,
+                        'uid': int(uid),
                         'subject': subject,
                         'description': None,
                         'images': [],
@@ -70,7 +70,7 @@ class mailParser:
                         multi = message.get_payload()[0]
                         body = multi.get_payload(decode=True).decode(encoding=msg_encoding)
 
-                    content = BeautifulSoup(body, 'lxml')
+                    content = BeautifulSoup(body, 'html.parser')
                     images = content.findAll('img')
                     for i in images:
                         item['images'].append(i['src'])
@@ -87,7 +87,7 @@ class mailParser:
                                 if item['description'] is None:
                                     item['description'] = t
                                 else:
-                                    if package:
+                                    if package and len(package['hosters']) > 0:
                                         item['packages'].append(package)
                                     package = {
                                         'subject': t,
@@ -97,17 +97,29 @@ class mailParser:
                         elif t.name == 'a' and t.find('img') is None and t.has_attr('href'):
                             h = ''.join(['' if ord(i) < 20 else i for i in t.getText()])
                             if h != '' and t['href'] != '':
-                                hoster = {
-                                    'subject': h,
-                                    'link': t['href']
-                                }
+                                addit = True
 
-                                package['hosters'].append(hoster)
+                                if self._HOSTER_WHITELIST != '':
+                                    match = re.match(self._HOSTER_WHITELIST, t['href'])
+                                    addit = (not match is None)
 
-                    if package:
+                                if addit and self._HOSTER_BLACKLIST != '':
+                                    match = re.match(self._HOSTER_BLACKLIST, t['href'])
+                                    addit = (match is None)
+
+                                if addit:
+                                    hoster = {
+                                        'subject': h,
+                                        'link': t['href']
+                                    }
+
+                                    package['hosters'].append(hoster)
+
+                    if package and len(package['hosters']) > 0:
                         item['packages'].append(package)
 
-                    retValue.append(item)
+                    if len(item['packages']) > 0:
+                        retValue.append(item)
 
             imapCon.logout()
 
