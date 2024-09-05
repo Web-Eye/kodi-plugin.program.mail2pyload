@@ -90,13 +90,23 @@ class mail2pyload:
             mail = json.loads(tag)
             for i in mail['images']:
 
-
                 tag = self._base64Encode(i)
                 url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(self._buildArgs(method='show', param='IMAGE', tag=tag))
                 self._guiManager.addItem(title='[IMG] ' + mail['subject'],url=url,poster=i)
 
+            print(mail['description'])
 
-
+            # print(mail['subject'])
+            # print(mail['description'])
+            # for i in mail['images']:
+            #     print(i)
+            #
+            # for p in mail['packages']:
+            #     print(p['subject'])
+            #     for h in p['hosters']:
+            #         print(h['subject'] + ": " + h['link'])
+            #
+            # print('________________________________________')
 
     def setMailView(self, **kwargs):
         page = kwargs.get('page')
@@ -119,24 +129,8 @@ class mail2pyload:
                 tag = json.dumps(mail)
                 tag = self._base64Encode(tag)
 
-                self._guiManager.addDirectory(title=mail['subject'], poster=poster, infoLabels=infoLabels,
+                self._guiManager.addDirectory(title=mail['subject'], poster=poster, infoLabels=infoLabels, _type='video',
                                               args=self._buildArgs(method='list', param='MAILDETAIL', tag=tag))
-
-
-
-                # print(mail['subject'])
-                # print(mail['description'])
-                # for i in mail['images']:
-                #     print(i)
-                #
-                # for p in mail['packages']:
-                #     print(p['subject'])
-                #     for h in p['hosters']:
-                #         print(h['subject'] + ": " + h['link'])
-                #
-                # print('________________________________________')
-
-
 
         except gaierror:
             self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_NOT_REACHABLE))
