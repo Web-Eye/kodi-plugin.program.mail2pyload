@@ -93,8 +93,7 @@ class mail2pyload:
 
                 tag = self._base64Encode(i)
                 url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(self._buildArgs(method='show', param='IMAGE', tag=tag))
-                # TODO: item is not playable
-                self._guiManager.addItem(title=mail['subject'],url=url,poster=i)
+                self._guiManager.addItem(title='[IMG] ' + mail['subject'],url=url,poster=i)
 
 
 

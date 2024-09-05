@@ -93,7 +93,8 @@ class GuiManager:
         elif self._fanart is not None:
             _property['Fanart_Image'] = self._fanart
 
-        _property['IsPlayable'] = 'true'
+        if not _type is None and _type == 'video':
+            _property['IsPlayable'] = 'true'
 
         self.__setEntity(title, url, art, _property, _type, infoLabels, False)
 
