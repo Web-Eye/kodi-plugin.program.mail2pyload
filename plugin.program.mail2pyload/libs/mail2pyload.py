@@ -20,6 +20,8 @@ import json
 import sys
 import urllib
 import urllib.parse
+from urllib.request import proxy_bypass
+
 from _socket import gaierror
 
 from libs.core.mailParser import mailParser
@@ -81,20 +83,28 @@ class mail2pyload:
         page = kwargs.get('page')
         tag = kwargs.get('tag')
 
-        infoLabels = {
-            'Title': 'Test'
-        }
-
         if not tag is None:
             tag = self._base64Decode(tag)
             mail = json.loads(tag)
+
+            poster = None
+            if len(mail['images']) > 0:
+                poster = mail['images'][0]
+
+
+
             for i in mail['images']:
 
                 tag = self._base64Encode(i)
                 url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(self._buildArgs(method='show', param='IMAGE', tag=tag))
-                self._guiManager.addItem(title='[IMG] ' + mail['subject'],url=url,poster=i)
+                self._guiManager.addItem(title='[THUMB] ' + mail['subject'],url=url,poster=i)
 
-            print(mail['description'])
+            for p in mail['packages']:
+                url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                    self._buildArgs(method='show', param='PACKAGE_ITEM'))
+                self._guiManager.addItem(title=p['subject'], url=url, poster=poster)
+
+
 
             # print(mail['subject'])
             # print(mail['description'])
@@ -145,15 +155,21 @@ class mail2pyload:
         tag = kwargs.get('tag')
 
         {
-            'IMAGE': self.showImage
+            'IMAGE': self.showImage,
+            'PACKAGE_ITEM': self.showImage
         }[param](tag=tag)
 
 
     def showImage(self, **kwargs):
-        tag = kwargs.get('tag')
-        image = self._base64Decode(tag)
+        try:
+            tag = kwargs.get('tag')
+            if tag:
+                image = self._base64Decode(tag)
 
-        xbmc.executebuiltin('ShowPicture(%s)' % image)
+                xbmc.executebuiltin('ShowPicture(%s)' % image)
+
+        except AttributeError:
+            pass
 
     @staticmethod
     def _buildArgs(**kwargs):
