@@ -49,7 +49,7 @@ class mailParser:
 
             if len(uid_list) > 0:
                 for uid in uid_list:
-                    result, data = imapCon.uid('fetch', uid, '(RFC822)')
+                    result, data = imapCon.uid('fetch', uid, '(BODY.PEEK[])')
                     raw_email = data[0][1].decode("utf-8")
                     message = email.message_from_string(raw_email)
                     subject = str(make_header(decode_header(message['subject'])))
