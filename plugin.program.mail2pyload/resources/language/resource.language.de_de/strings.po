@@ -91,3 +91,23 @@ msgstr "Hoster Whitelist"
 msgctxt "#30621"
 msgid "HOSTER_BLACKLIST"
 msgstr "Hoster Blacklist"
+
+msgctxt "#30700"
+msgid "PYLOAD_SETTINGS"
+msgstr "pyLoad Einstellungen"
+
+msgctxt "#30701"
+msgid "PYLOAD_SERVER"
+msgstr "pyLoad Server"
+
+msgctxt "#30721"
+msgid "PYLOAD_PORT"
+msgstr "pyLoad Port"
+
+msgctxt "#30741"
+msgid "PYLOAD_USERNAME"
+msgstr "pyLoad Benutzername"
+
+msgctxt "#30761"
+msgid "PYLOAD_PASSWORD"
+msgstr "pyLoad Passwort"

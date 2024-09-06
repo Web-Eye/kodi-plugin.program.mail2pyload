@@ -69,5 +69,91 @@
                 </setting>
             </group>
         </category>
+        <category id="pyload_settings" label="30700">
+            <group id="1">
+                <setting id="pyload_server" type="string" label="30701" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30701</heading>
+                    </control>
+                </setting>
+                <setting id="pyload_port" type="integer" label="30721" help="">
+                    <default>8000</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30721</heading>
+                    </control>
+                </setting>
+                <setting id="pyload_username" type="string" label="30741" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30741</heading>
+                    </control>
+                </setting>
+                <setting id="pyload_password" type="string" label="30761" help="">
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30761</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+            </group>
+        </category><category id="imap_settings" label="30500">
+            <group id="1">
+                <setting id="imap_server" type="string" label="30501" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30501</heading>
+                    </control>
+                </setting>
+                <setting id="imap_port" type="integer" label="30521" help="">
+                    <default>993</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30521</heading>
+                    </control>
+                </setting>
+                <setting id="imap_username" type="string" label="30541" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30541</heading>
+                    </control>
+                </setting>
+                <setting id="imap_password" type="string" label="30561" help="">
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30561</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+                <setting id="imap_folder" type="string" label="30581" help="">
+                    <default>INBOX</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30581</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
     </section>
 </settings>

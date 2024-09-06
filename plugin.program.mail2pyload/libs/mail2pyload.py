@@ -25,6 +25,7 @@ from urllib.request import proxy_bypass
 from _socket import gaierror
 
 from libs.core.mailParser import mailParser
+from libs.core.pyloadAPI import pyloadAPI
 from libs.kodion.gui_manager import *
 from libs.kodion.addon import Addon
 from libs.translations import *
@@ -56,6 +57,11 @@ class mail2pyload:
         self._HOSTER_WHITELIST = addon.getSetting('hoster_whitelist')
         self._HOSTER_BLACKLIST = addon.getSetting('hoster_blacklist')
 
+        self._PYLOAD_SERVER = addon.getSetting('pyload_server')
+        self._PYLOAD_PORT = int(addon.getSetting('pyload_port'))
+        self._PYLOAD_USERNAME = addon.getSetting('pyload_username')
+        self._PYLOAD_PASSWORD = addon.getSetting('pyload_password')
+
         self._guiManager = GuiManager(sys.argv[1], self._ADDON_ID, self._DEFAULT_IMAGE_URL, self._FANART)
 
     def setHomeView(self, **args):
@@ -76,7 +82,8 @@ class mail2pyload:
 
         {
             'NEWMAIL': self.setMailView,
-            'MAILDETAIL': self.setMailDetailView
+            'MAILDETAIL': self.setMailDetailView,
+            'PYLOAD_PACKAGE': self.setPyLoadPackageView
         }[param](page=page, tag=tag)
 
     def setMailDetailView(self, **kwargs):
@@ -117,6 +124,14 @@ class mail2pyload:
             #         print(h['subject'] + ": " + h['link'])
             #
             # print('________________________________________')
+
+
+    def setPyLoadPackageView(self, **kwargs):
+        page = kwargs.get('page')
+        tag = kwargs.get('tag')
+
+        api = pyloadAPI( self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+        api.info()
 
     def setMailView(self, **kwargs):
         page = kwargs.get('page')
