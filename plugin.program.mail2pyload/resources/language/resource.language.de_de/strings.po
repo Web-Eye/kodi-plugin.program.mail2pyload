@@ -28,6 +28,18 @@ msgctxt "#30102"
 msgid "PYLOAD_PACKAGE"
 msgstr "pyLoad Paket"
 
+msgctxt "#30103"
+msgid "MARK_MAIL_SEEN"
+msgstr "Markiere als 'Gelesen'"
+
+msgctxt "#30104"
+msgid "MARK_MAIL_DONE"
+msgstr "Markiere als 'Bearbeitet'"
+
+msgctxt "#30105"
+msgid "MARK_MAIL_DELETED"
+msgstr "Markiere als 'Gelöscht'"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"

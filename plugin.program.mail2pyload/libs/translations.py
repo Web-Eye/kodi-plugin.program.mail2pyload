@@ -22,6 +22,9 @@ ERROR = 'error'
 IMAP_ERROR = 'imap_error'
 IMAP_SERVER_NOT_REACHABLE = 'imap_server_not_reachable'
 IMAP_SERVER_REFUSED = 'imap_server_not_reachable'
+MARK_MAIL_SEEN = 'mark_mail_seen'
+MARK_MAIL_DONE = 'mark_mail_done'
+MARK_MAIL_DELETED = 'mark_mail_deleted'
 
 class Translations:
 
@@ -37,6 +40,9 @@ class Translations:
             ERROR:                      self._language(30200),
             IMAP_ERROR:                 self._language(30201),
             IMAP_SERVER_NOT_REACHABLE:  self._language(30202),
-            IMAP_SERVER_REFUSED:        self._language(30203)
+            IMAP_SERVER_REFUSED:        self._language(30203),
+            MARK_MAIL_SEEN:             self._language(30103),
+            MARK_MAIL_DONE:             self._language(30104),
+            MARK_MAIL_DELETED:          self._language(30105)
 
         }[name]

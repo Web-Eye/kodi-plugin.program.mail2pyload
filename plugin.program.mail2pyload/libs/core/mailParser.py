@@ -33,7 +33,7 @@ class mailParser:
         self._HOSTER_WHITELIST = hoster_whitelist
         self._HOSTER_BLACKLIST = hoster_blacklist
 
-    @property
+
     def getNewMails(self):
 
         retValue = []
@@ -125,5 +125,21 @@ class mailParser:
 
         return retValue
 
+    def setFlag(self, uid, flag, value):
 
+        with imaplib.IMAP4_SSL(host=self._IMAP_SERVER, port=self._IMAP_PORT) as imapCon:
+            imapCon.login(user=self._IMAP_USERNAME, password=self._IMAP_PASSWORD)
+            imapCon.select(self._IMAP_FOLDER)
 
+            arg1 = '-FLAGS'
+            if value:
+                arg1 = '+FLAGS'
+
+            arg2 = {
+                'SEEN':     '\\Seen',
+                'DONE':     '\\Flagged',
+                'DELETED':  '\\Deleted'
+            }[flag]
+
+            val1, val2 = imapCon.uid('store', uid, arg1, arg2)
+            imapCon.logout()

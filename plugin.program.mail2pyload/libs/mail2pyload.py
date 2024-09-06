@@ -125,7 +125,7 @@ class mail2pyload:
         try:
 
             p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
-            mails = p.getNewMails
+            mails = p.getNewMails()
             for mail in mails:
                 poster = self._ICON
                 if len(mail['images']) > 0:
@@ -139,7 +139,21 @@ class mail2pyload:
                 tag = json.dumps(mail)
                 tag = self._base64Encode(tag)
 
+                seen_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                    self._buildArgs(method='markmail', param='SEEN', tag=mail['uid']))
+                done_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                    self._buildArgs(method='markmail', param='DONE', tag=mail['uid']))
+                deleted_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                    self._buildArgs(method='markmail', param='DELETED', tag=mail['uid']))
+
+                contextmenu = [
+                    (self._t.getString(MARK_MAIL_SEEN), f'RunPlugin("{seen_url}")'),
+                    (self._t.getString(MARK_MAIL_DONE), f'RunPlugin("{done_url}")'),
+                    (self._t.getString(MARK_MAIL_DELETED), f'RunPlugin("{deleted_url}")'),
+                ]
+
                 self._guiManager.addDirectory(title=mail['subject'], poster=poster, infoLabels=infoLabels, _type='video',
+                                              contextmenu=contextmenu,
                                               args=self._buildArgs(method='list', param='MAILDETAIL', tag=tag))
 
         except gaierror:
@@ -155,8 +169,8 @@ class mail2pyload:
         tag = kwargs.get('tag')
 
         {
-            'IMAGE': self.showImage,
-            'PACKAGE_ITEM': self.showImage
+            'IMAGE':            self.showImage,
+            'PACKAGE_ITEM':     self.showImage
         }[param](tag=tag)
 
 
@@ -170,6 +184,29 @@ class mail2pyload:
 
         except AttributeError:
             pass
+
+    def markMail(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        try:
+
+            p = mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER,
+                           self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
+
+            p.setFlag(tag, param, True)
+            if param != 'SEEN':
+                xbmc.executebuiltin('Container.Refresh')
+
+
+        except gaierror:
+            self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_NOT_REACHABLE))
+        except ConnectionRefusedError:
+            self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_REFUSED))
+        except imaplib.IMAP4.error as e:
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
+
+
 
     @staticmethod
     def _buildArgs(**kwargs):
@@ -232,9 +269,10 @@ class mail2pyload:
         navigation = args.get('navigation')
 
         {
-            'home': self.setHomeView,
-            'list': self.setListView,
-            'show': self.showEntity
+            'home':         self.setHomeView,
+            'list':         self.setListView,
+            'show':         self.showEntity,
+            'markmail':     self.markMail
         }[method](param=param, page=page, tag=tag, navigation=navigation)
 
         self._guiManager.endOfDirectory()

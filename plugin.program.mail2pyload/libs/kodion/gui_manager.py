@@ -48,7 +48,7 @@ class GuiManager:
     def setContent(self, content):
         xbmcplugin.setContent(self._argv, content)
 
-    def __setEntity(self, title, url, art, _property, _type, infolabels, isFolder):
+    def __setEntity(self, title, url, art=None, _property=None, _type=None, infoLabels=None, contextmenu=None, isFolder=True):
         li = xbmcgui.ListItem(label=str(title))
         if art is not None:
             li.setArt(art)
@@ -57,12 +57,15 @@ class GuiManager:
             for key, value in _property.items():
                 li.setProperty(key, value)
 
-        if _type is not None and infolabels is not None:
-            li.setInfo(type=_type, infoLabels=infolabels)
+        if _type is not None and infoLabels is not None:
+            li.setInfo(type=_type, infoLabels=infoLabels)
+
+        if contextmenu:
+            li.addContextMenuItems(contextmenu)
 
         xbmcplugin.addDirectoryItem(handle=self._argv, url=url, listitem=li, isFolder=isFolder)
 
-    def addDirectory(self, title, poster=None, fanArt=None, _type=None, infoLabels=None, args=None):
+    def addDirectory(self, title, poster=None, fanArt=None, _type=None, infoLabels=None, contextmenu=None, args=None):
         art = {}
         _property = {}
 
@@ -77,9 +80,9 @@ class GuiManager:
             _property['Fanart_Image'] = self._fanart
 
         url = 'plugin://' + self._addon_id + '/?' + urllib.parse.urlencode(args)
-        self.__setEntity(title, url, art, _property, _type, infoLabels, True)
+        self.__setEntity(title=title, url=url, art=art, _property=_property, _type=_type, infoLabels=infoLabels, contextmenu=contextmenu, isFolder=True)
 
-    def addItem(self, title, url, poster=None, fanArt=None, _type=None, infoLabels=None):
+    def addItem(self, title, url, poster=None, fanArt=None, _type=None, infoLabels=None, contextmenu=None):
         art = {}
         _property = {}
 
@@ -96,7 +99,7 @@ class GuiManager:
         if not _type is None and _type == 'video':
             _property['IsPlayable'] = 'true'
 
-        self.__setEntity(title, url, art, _property, _type, infoLabels, False)
+        self.__setEntity(title=title, url=url, art=art, _property=_property, _type=_type, infoLabels=infoLabels, contextmenu=contextmenu, isFolder=False)
 
     def addSortMethod(self, sortMethod):
         xbmcplugin.addSortMethod(self._argv, sortMethod)
