@@ -156,8 +156,13 @@ class mail2pyload:
                     for item in data:
                         name = item['name']
                         if item['sizedone'] > 0 and item['sizetotal'] > 0:
-                            pct = item['sizedone'] / item['sizetotal'] * 100
-                            name = f'[{pct}%] {name}'
+                            pct = int(item['sizedone'] / item['sizetotal'] * 100)
+                            padding = ''
+                            if pct < 10:
+                                padding = '  '
+                            elif pct < 100:
+                                padding = ' '
+                            name = f'{padding}[{pct}%] {name}'
 
                         self._guiManager.addDirectory(title=name, poster=self._ICON,
                                                       args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL'))
