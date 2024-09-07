@@ -40,21 +40,41 @@ msgctxt "#30105"
 msgid "MARK_MAIL_DELETED"
 msgstr "Markiere als 'Gelöscht'"
 
+msgctxt "#30106"
+msgid "PYLOAD_QUEUE"
+msgstr "Queue"
+
+msgctxt "#30107"
+msgid "PYLOAD_COLLECTOR"
+msgstr "Collector"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"
 
 msgctxt "#30201"
 msgid "IMAP_ERROR"
-msgstr "IMAP Error"
+msgstr "IMAP Fehler"
 
 msgctxt "#30202"
-msgid "IMAP_SERVER_NOT_REACHABLE"
-msgstr "IMAP Server nicht erreichbar"
+msgid "SERVER_NOT_REACHABLE"
+msgstr "Server nicht erreichbar"
 
 msgctxt "#30203"
-msgid "IMAP_SERVER_REFUSED"
+msgid "SERVER_REFUSED"
 msgstr "Es konnte keine Verbindung hergestellt werden, da der Zielcomputer die Verbindung verweigerte."
+
+msgctxt "#30204"
+msgid "PYLOAD_ERROR"
+msgstr "pyLoad Fehler"
+
+msgctxt "#30205"
+msgid "PYLOAD_ERROR_UMNKOWN"
+msgstr "unbekannter pyLoad Fehler"
+
+msgctxt "#30206"
+msgid "PYLOAD_STATUS_CODE"
+msgstr "pyLoad antwortet:"
 
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"

@@ -20,8 +20,9 @@ import json
 import sys
 import urllib
 import urllib.parse
-from urllib.request import proxy_bypass
 
+
+import requests
 from _socket import gaierror
 
 from libs.core.mailParser import mailParser
@@ -83,8 +84,11 @@ class mail2pyload:
         {
             'NEWMAIL': self.setMailView,
             'MAILDETAIL': self.setMailDetailView,
-            'PYLOAD_PACKAGE': self.setPyLoadPackageView
-        }[param](page=page, tag=tag)
+            'PYLOAD_PACKAGE': self.setPyLoadPackageView,
+            'PYLOAD_QUEUE': self.setPyLoadPackageDetailView,
+            'PYLOAD_COLLECTOR': self.setPyLoadPackageDetailView,
+            'PYLOAD_PACKAGE_DETAIL': self.setPyloadPackageContentView
+        }[param](page=page, tag=tag, param=param)
 
     def setMailDetailView(self, **kwargs):
         page = kwargs.get('page')
@@ -127,11 +131,47 @@ class mail2pyload:
 
 
     def setPyLoadPackageView(self, **kwargs):
-        page = kwargs.get('page')
-        tag = kwargs.get('tag')
 
-        api = pyloadAPI( self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
-        api.info()
+        self._guiManager.addDirectory(title=self._t.getString(PYLOAD_QUEUE), poster=self._ICON,
+                                      args=self._buildArgs(method='list', param='PYLOAD_QUEUE'))
+        self._guiManager.addDirectory(title=self._t.getString(PYLOAD_COLLECTOR), poster=self._ICON,
+                                      args=self._buildArgs(method='list', param='PYLOAD_COLLECTOR'))
+
+
+    def setPyLoadPackageDetailView(self, **kwargs):
+        param = kwargs.get('param')
+
+        try:
+
+            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+            response = None
+            if param == 'PYLOAD_QUEUE':
+                response = api.getQueue()
+            elif param == 'PYLOAD_COLLECTOR':
+                response = api.getCollector()
+
+            if not response is None and response.status_code == 200:
+                if response.text:
+                    data = json.loads(response.text)
+                    for item in data:
+                        name = item['name']
+                        if item['sizedone'] > 0 and item['sizetotal'] > 0:
+                            pct = item['sizedone'] / item['sizetotal'] * 100
+                            name = f'[{pct}%] {name}'
+
+                        self._guiManager.addDirectory(title=name, poster=self._ICON,
+                                                      args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL'))
+
+            else:
+                self.handlePyLoadErrorResponse(response)
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE))
+
+
+    def setPyloadPackageContentView(self):
+        pass
 
     def setMailView(self, **kwargs):
         page = kwargs.get('page')
@@ -172,9 +212,9 @@ class mail2pyload:
                                               args=self._buildArgs(method='list', param='MAILDETAIL', tag=tag))
 
         except gaierror:
-            self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_NOT_REACHABLE))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
         except ConnectionRefusedError:
-            self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_REFUSED))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED))
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
 
@@ -215,13 +255,20 @@ class mail2pyload:
 
 
         except gaierror:
-            self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_NOT_REACHABLE))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
         except ConnectionRefusedError:
-            self._guiManager.setToastNotification(self._t.getString(ERROR), self._t.getString(IMAP_SERVER_REFUSED))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED))
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
 
+    def handlePyLoadErrorResponse(self, response):
+        if not response is None:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(PYLOAD_STATUS_CODE) + f' ({response.status_code}) {response.reason}')
 
+        else:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(PYLOAD_ERROR_UMNKOWN))
 
     @staticmethod
     def _buildArgs(**kwargs):

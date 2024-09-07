@@ -32,17 +32,15 @@ class pyloadAPI:
         }
 
         self._session = requests.Session()
-        response = self._session.post(f'{self._baseURL}login', headers=self._headers, data=payload, files=formdata)
+        self._session.post(f'{self._baseURL}login', headers=self._headers, data=payload, files=formdata)
 
-        print(response.text)
 
-    def info(self):
-        try:
+    def getQueue(self):
+        return self._session.post(f'{self._baseURL}getQueue', headers=self._headers)
 
-            response = self._session.post(f'{self._baseURL}getServerVersion', headers=self._headers)
+    def getCollector(self):
+        return self._session.post(f'{self._baseURL}getCollector', headers=self._headers)
 
-            print(response.text)
-        except:
-            print("Login was wrong")
+
 
 

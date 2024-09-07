@@ -18,13 +18,18 @@
 HOME = 'home'
 NEW_MAIL = 'new_mail'
 PYLOAD_PACKAGE = 'pyload_package'
+PYLOAD_QUEUE = 'pyload_queue'
+PYLOAD_COLLECTOR = 'pyload_collector'
 ERROR = 'error'
 IMAP_ERROR = 'imap_error'
-IMAP_SERVER_NOT_REACHABLE = 'imap_server_not_reachable'
-IMAP_SERVER_REFUSED = 'imap_server_not_reachable'
+SERVER_NOT_REACHABLE = 'imap_server_not_reachable'
+SERVER_REFUSED = 'imap_server_not_reachable'
 MARK_MAIL_SEEN = 'mark_mail_seen'
 MARK_MAIL_DONE = 'mark_mail_done'
 MARK_MAIL_DELETED = 'mark_mail_deleted'
+PYLOAD_ERROR = 'pyload_error'
+PYLOAD_ERROR_UMNKOWN = 'pyload_error_unkown'
+PYLOAD_STATUS_CODE = 'pyload_status_code'
 
 class Translations:
 
@@ -37,10 +42,15 @@ class Translations:
             HOME:                       self._language(30100),
             NEW_MAIL:                   self._language(30101),
             PYLOAD_PACKAGE:             self._language(30102),
+            PYLOAD_QUEUE:               self._language(30106),
+            PYLOAD_COLLECTOR:           self._language(30107),
             ERROR:                      self._language(30200),
             IMAP_ERROR:                 self._language(30201),
-            IMAP_SERVER_NOT_REACHABLE:  self._language(30202),
-            IMAP_SERVER_REFUSED:        self._language(30203),
+            SERVER_NOT_REACHABLE:       self._language(30202),
+            SERVER_REFUSED:             self._language(30203),
+            PYLOAD_ERROR:               self._language(30204),
+            PYLOAD_ERROR_UMNKOWN:       self._language(30205),
+            PYLOAD_STATUS_CODE:         self._language(30206),
             MARK_MAIL_SEEN:             self._language(30103),
             MARK_MAIL_DONE:             self._language(30104),
             MARK_MAIL_DELETED:          self._language(30105)

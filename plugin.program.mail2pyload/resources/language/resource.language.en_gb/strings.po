@@ -40,6 +40,14 @@ msgctxt "#30105"
 msgid "MARK_MAIL_DELETED"
 msgstr "Mark as 'Deleted'"
 
+msgctxt "#30106"
+msgid "PYLOAD_QUEUE"
+msgstr "Queue"
+
+msgctxt "#30107"
+msgid "PYLOAD_COLLECTOR"
+msgstr "Collector"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"
@@ -49,12 +57,24 @@ msgid "IMAP_ERROR"
 msgstr "IMAP Error"
 
 msgctxt "#30202"
-msgid "IMAP_SERVER_NOT_REACHABLE"
-msgstr "IMAP Server not reachable"
+msgid "SERVER_NOT_REACHABLE"
+msgstr "Server not reachable"
 
 msgctxt "#30203"
-msgid "IMAP_SERVER_REFUSED"
+msgid "SERVER_REFUSED"
 msgstr "No connection could be made because the target machine actively refused it."
+
+msgctxt "#30204"
+msgid "PYLOAD_ERROR"
+msgstr "pyLoad Error"
+
+msgctxt "#30205"
+msgid "PYLOAD_ERROR_UMNKOWN"
+msgstr "Unknown pyLoad Error"
+
+msgctxt "#30206"
+msgid "PYLOAD_STATUS_CODE"
+msgstr "pyLoad responses:"
 
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"
