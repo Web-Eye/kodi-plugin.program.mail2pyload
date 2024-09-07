@@ -42,7 +42,7 @@ class mailParser:
         with imaplib.IMAP4_SSL(host=self._IMAP_SERVER, port=self._IMAP_PORT) as imapCon:
             imapCon.login(user=self._IMAP_USERNAME, password=self._IMAP_PASSWORD)
             imapCon.select(self._IMAP_FOLDER)
-            result, data = imapCon.uid('search', None, 'UNFLAGGED')
+            result, data = imapCon.uid('search', None, 'UNFLAGGED UNDELETED')
 
             uids = data[0]
             uid_list = uids.split()
