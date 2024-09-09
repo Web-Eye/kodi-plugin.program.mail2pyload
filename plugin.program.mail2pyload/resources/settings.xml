@@ -107,50 +107,13 @@
                     </control>
                 </setting>
             </group>
-        </category><category id="imap_settings" label="30500">
-            <group id="1">
-                <setting id="imap_server" type="string" label="30501" help="">
+            <group id="2">
+                <setting id="pyload_default_package_name" type="string" label="30781" help="">
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
                     <control type="edit" format="string">
-                        <heading>30501</heading>
-                    </control>
-                </setting>
-                <setting id="imap_port" type="integer" label="30521" help="">
-                    <default>993</default>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="integer">
-                        <heading>30521</heading>
-                    </control>
-                </setting>
-                <setting id="imap_username" type="string" label="30541" help="">
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>30541</heading>
-                    </control>
-                </setting>
-                <setting id="imap_password" type="string" label="30561" help="">
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>30561</heading>
-                        <hidden>true</hidden>
-                    </control>
-                </setting>
-                <setting id="imap_folder" type="string" label="30581" help="">
-                    <default>INBOX</default>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <control type="edit" format="string">
-                        <heading>30581</heading>
+                        <heading>30781</heading>
                     </control>
                 </setting>
             </group>

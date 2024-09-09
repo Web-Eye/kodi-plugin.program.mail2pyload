@@ -30,6 +30,7 @@ MARK_MAIL_DELETED = 'mark_mail_deleted'
 PYLOAD_ERROR = 'pyload_error'
 PYLOAD_ERROR_UMNKOWN = 'pyload_error_unkown'
 PYLOAD_STATUS_CODE = 'pyload_status_code'
+PYLOAD_ADDTO_PACKAGE = 'pyload_addto_package'
 
 class Translations:
 
@@ -53,6 +54,7 @@ class Translations:
             PYLOAD_STATUS_CODE:         self._language(30206),
             MARK_MAIL_SEEN:             self._language(30103),
             MARK_MAIL_DONE:             self._language(30104),
-            MARK_MAIL_DELETED:          self._language(30105)
+            MARK_MAIL_DELETED:          self._language(30105),
+            PYLOAD_ADDTO_PACKAGE:       self._language(30108)
 
         }[name]

@@ -63,6 +63,8 @@ class mail2pyload:
         self._PYLOAD_USERNAME = addon.getSetting('pyload_username')
         self._PYLOAD_PASSWORD = addon.getSetting('pyload_password')
 
+        self._PYLOAD_DEFAULT_PACKAGE_NAME = addon.getSetting('pyload_default_package_name')
+
         self._guiManager = GuiManager(sys.argv[1], self._ADDON_ID, self._DEFAULT_IMAGE_URL, self._FANART)
 
     def setHomeView(self, **args):
@@ -102,8 +104,6 @@ class mail2pyload:
             if len(mail['images']) > 0:
                 poster = mail['images'][0]
 
-
-
             for i in mail['images']:
 
                 tag = self._base64Encode(i)
@@ -113,7 +113,18 @@ class mail2pyload:
             for p in mail['packages']:
                 url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                     self._buildArgs(method='show', param='PACKAGE_ITEM'))
-                self._guiManager.addItem(title=p['subject'], url=url, poster=poster)
+
+                contextmenu = []
+
+                for h in p['hosters']:
+                    tag = self._base64Encode( h['link'])
+
+                    pyload_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                        self._buildArgs(method='add', param='PYLOAD_PACKAGE', tag=tag))
+
+                    contextmenu.append((h['subject'], f'RunPlugin("{pyload_url}")'))
+
+                self._guiManager.addItem(title=p['subject'], url=url, poster=poster, contextmenu=contextmenu)
 
 
 
@@ -266,6 +277,45 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
 
+    def addEntity(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        {
+            'PYLOAD_PACKAGE': self.addPyLoadPackage
+        }[param](tag=tag)
+
+    def addPyLoadPackage(self, tag):
+        tag = self._base64Decode(tag)
+
+        try:
+            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+            response = None
+            # response = api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, tag)
+            response = api.getCollector()
+            pid = 0
+
+            if not response is None and response.status_code == 200:
+                if response.text:
+                    data = json.loads(response.text)
+                    result = next(filter(lambda x: x['name'] == self._PYLOAD_DEFAULT_PACKAGE_NAME , data), None)
+                    if not result is None:
+                        pid = result['pid']
+
+            else:
+                self.handlePyLoadErrorResponse(response)
+
+            if pid == 0:
+                response = api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, tag)
+            else:
+                response = api.addFiles(pid, tag)
+
+            if response is None or response.status_code != 200:
+                self.handlePyLoadErrorResponse(response)
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
+
     def handlePyLoadErrorResponse(self, response):
         if not response is None:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
@@ -339,7 +389,8 @@ class mail2pyload:
             'home':         self.setHomeView,
             'list':         self.setListView,
             'show':         self.showEntity,
-            'markmail':     self.markMail
+            'markmail':     self.markMail,
+            'add':          self.addEntity
         }[method](param=param, page=page, tag=tag, navigation=navigation)
 
         self._guiManager.endOfDirectory()

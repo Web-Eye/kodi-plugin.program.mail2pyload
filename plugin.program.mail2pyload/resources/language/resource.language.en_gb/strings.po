@@ -48,6 +48,10 @@ msgctxt "#30107"
 msgid "PYLOAD_COLLECTOR"
 msgstr "Collector"
 
+msgctxt "#30108"
+msgid "PYLOAD_ADDTO_PACKAGE"
+msgstr "Add to pyLoad Paket"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"
@@ -131,3 +135,7 @@ msgstr "pyLoad Username"
 msgctxt "#30761"
 msgid "PYLOAD_PASSWORD"
 msgstr "pyLoad Password"
+
+msgctxt "#30781"
+msgid "PYLOAD_DEFAULT_PACKAGE_NAME"
+msgstr "Default Package Name"

@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
+import json
 
 import requests
 
@@ -41,6 +42,22 @@ class pyloadAPI:
     def getCollector(self):
         return self._session.post(f'{self._baseURL}getCollector', headers=self._headers)
 
+    def addPackage(self, name, link):
+        data = {
+            'name': name,
+            'links': [link],
+            'dest': 0
+        }
 
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}addPackage', headers=self._headers, data=payload)
 
+    def addFiles(self, pid, link):
+        data = {
+            'pid': pid,
+            'links': [link]
+        }
+
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}addFiles', headers=self._headers, data=payload)
 
