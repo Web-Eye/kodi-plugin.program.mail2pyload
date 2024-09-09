@@ -31,6 +31,9 @@ PYLOAD_ERROR = 'pyload_error'
 PYLOAD_ERROR_UMNKOWN = 'pyload_error_unkown'
 PYLOAD_STATUS_CODE = 'pyload_status_code'
 PYLOAD_ADDTO_PACKAGE = 'pyload_addto_package'
+PYLOAD_MOVETO_QUEUE = 'pyload_moveto_queue'
+PYLOAD_MOVETO_COLLECTOR = 'pyload_moveto_collector'
+PYLOAD_DELETE_PACKAGE = 'pyload_delete_package'
 
 class Translations:
 
@@ -55,6 +58,9 @@ class Translations:
             MARK_MAIL_SEEN:             self._language(30103),
             MARK_MAIL_DONE:             self._language(30104),
             MARK_MAIL_DELETED:          self._language(30105),
-            PYLOAD_ADDTO_PACKAGE:       self._language(30108)
+            PYLOAD_ADDTO_PACKAGE:       self._language(30108),
+            PYLOAD_MOVETO_QUEUE:        self._language(30109),
+            PYLOAD_MOVETO_COLLECTOR:    self._language(30110),
+            PYLOAD_DELETE_PACKAGE:      self._language(30111)
 
         }[name]

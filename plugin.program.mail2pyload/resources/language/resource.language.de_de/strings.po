@@ -52,6 +52,18 @@ msgctxt "#30108"
 msgid "PYLOAD_ADDTO_PACKAGE"
 msgstr "Sende zu pyLoad Paket"
 
+msgctxt "#30109"
+msgid "PYLOAD_MOVETO_QUEUE"
+msgstr "Verschiebe zur 'Queue'"
+
+msgctxt "#30110"
+msgid "PYLOAD_MOVETO_COLLECTOR"
+msgstr "Verschiebe zum 'Collector'"
+
+msgctxt "#30111"
+msgid "PYLOAD_DELETE_PACKAGE"
+msgstr "Lösche Paket"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"

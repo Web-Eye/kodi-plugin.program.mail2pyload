@@ -127,20 +127,6 @@ class mail2pyload:
                 self._guiManager.addItem(title=p['subject'], url=url, poster=poster, contextmenu=contextmenu)
 
 
-
-            # print(mail['subject'])
-            # print(mail['description'])
-            # for i in mail['images']:
-            #     print(i)
-            #
-            # for p in mail['packages']:
-            #     print(p['subject'])
-            #     for h in p['hosters']:
-            #         print(h['subject'] + ": " + h['link'])
-            #
-            # print('________________________________________')
-
-
     def setPyLoadPackageView(self, **kwargs):
 
         self._guiManager.addDirectory(title=self._t.getString(PYLOAD_QUEUE), poster=self._ICON,
@@ -175,7 +161,24 @@ class mail2pyload:
                                 padding = ' '
                             name = f'{padding}[{pct}%] {name}'
 
-                        self._guiManager.addDirectory(title=name, poster=self._ICON,
+                        arg = 'PYLOAD_QUEUE'
+                        contextTitle = PYLOAD_MOVETO_QUEUE
+                        if param == 'PYLOAD_QUEUE':
+                            arg = 'PYLOAD_COLLECTOR'
+                            contextTitle = PYLOAD_MOVETO_COLLECTOR
+
+                        move_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                            self._buildArgs(method='move', param=arg, tag=item['pid']))
+
+                        delete_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                            self._buildArgs(method='delete', param='PYLOAD_PACKAGE', tag=item['pid']))
+
+                        contextmenu = [
+                            (self._t.getString(contextTitle), f'RunPlugin("{move_url}")'),
+                            (self._t.getString(PYLOAD_DELETE_PACKAGE), f'RunPlugin("{delete_url}")'),
+                        ]
+
+                        self._guiManager.addDirectory(title=name, poster=self._ICON, contextmenu=contextmenu,
                                                       args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL'))
 
             else:
@@ -186,7 +189,7 @@ class mail2pyload:
                                                   self._t.getString(SERVER_NOT_REACHABLE))
 
 
-    def setPyloadPackageContentView(self):
+    def setPyloadPackageContentView(self, **kwargs):
         pass
 
     def setMailView(self, **kwargs):
@@ -290,8 +293,6 @@ class mail2pyload:
 
         try:
             api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
-            response = None
-            # response = api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, tag)
             response = api.getCollector()
             pid = 0
 
@@ -310,11 +311,77 @@ class mail2pyload:
             else:
                 response = api.addFiles(pid, tag)
 
+            # TODO: set Notification, if succeed
+
             if response is None or response.status_code != 200:
                 self.handlePyLoadErrorResponse(response)
 
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
+
+    def moveEntity(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        {
+            'PYLOAD_QUEUE': self.movePyloadPackage,
+            'PYLOAD_COLLECTOR': self.movePyloadPackage
+        }[param](param=param, tag=tag)
+
+    def deleteEntity(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        {
+            'PYLOAD_PACKAGE': self.deletePyloadPackage
+        }[param](tag=tag)
+
+    def movePyloadPackage(self, **kwargs):
+        param = kwargs.get('param')
+        pid = kwargs.get('tag')
+
+        dest = {
+            'PYLOAD_QUEUE': 1,
+            'PYLOAD_COLLECTOR': 0
+        }[param]
+
+        try:
+
+            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+            response = api.movePackage(pid=pid, destination=dest)
+
+            # TODO: set Notification, if succeed
+            # TODO: reload screen, if succed
+
+            if response is None or response.status_code != 200:
+                self.handlePyLoadErrorResponse(response)
+
+
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE))
+
+
+    def deletePyloadPackage(self, **kwargs):
+        pid = kwargs.get('tag')
+
+        # TODO: if package not finished, do a msgbox to verify the deletion
+
+        try:
+
+            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+            response = api.deletePackage(pid=pid)
+            if response is None or response.status_code != 200:
+                self.handlePyLoadErrorResponse(response)
+
+            # TODO: set Notification, if succeed
+            # TODO: reload screen, if succed
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE))
+
 
     def handlePyLoadErrorResponse(self, response):
         if not response is None:
@@ -390,7 +457,9 @@ class mail2pyload:
             'list':         self.setListView,
             'show':         self.showEntity,
             'markmail':     self.markMail,
-            'add':          self.addEntity
+            'add':          self.addEntity,
+            'move':         self.moveEntity,
+            'delete':       self.deleteEntity
         }[method](param=param, page=page, tag=tag, navigation=navigation)
 
         self._guiManager.endOfDirectory()

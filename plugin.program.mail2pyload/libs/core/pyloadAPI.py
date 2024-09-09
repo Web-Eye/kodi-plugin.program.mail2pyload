@@ -54,10 +54,26 @@ class pyloadAPI:
 
     def addFiles(self, pid, link):
         data = {
-            'pid': pid,
+            'package_id': pid,
             'links': [link]
         }
 
         payload = {k: json.dumps(v) for k, v in data.items()}
         return self._session.post(f'{self._baseURL}addFiles', headers=self._headers, data=payload)
 
+    def movePackage(self, pid, destination):
+        data = {
+            'package_id': pid,
+            'destination': destination
+        }
+
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}movePackage', headers=self._headers, data=payload)
+
+    def deletePackage(self, pid):
+        data = {
+            'package_ids': [pid]
+        }
+
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}deletePackages', headers=self._headers, data=payload)
