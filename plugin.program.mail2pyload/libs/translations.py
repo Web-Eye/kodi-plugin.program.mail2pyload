@@ -38,6 +38,8 @@ PYLOAD_NOTIFICATION = 'pyload_notification'
 PYLOAD_ADDED_SUCCESFULLY = 'pyload_added_succesfully'
 PYLOAD_MOVED_SUCCESFULLY = 'pyload_moved_succesfully'
 PYLOAD_DELETED_SUCCESFULLY = 'pyload_deleted_succesfully'
+PYLOAD_QUESTION = 'pyload_question'
+PYLOAD_DELETE_CONFIRMATION = 'pyload_delete_confirmation'
 
 class Translations:
 
@@ -70,5 +72,7 @@ class Translations:
             PYLOAD_ADDED_SUCCESFULLY:   self._language(30208),
             PYLOAD_MOVED_SUCCESFULLY:   self._language(30209),
             PYLOAD_DELETED_SUCCESFULLY: self._language(30210),
+            PYLOAD_QUESTION:            self._language(30211),
+            PYLOAD_DELETE_CONFIRMATION: self._language(30212)
 
         }[name]

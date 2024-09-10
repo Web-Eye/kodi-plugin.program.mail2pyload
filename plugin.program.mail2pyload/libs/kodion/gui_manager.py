@@ -17,7 +17,6 @@
 
 import xbmcplugin
 import xbmcgui
-import xbmc
 
 import urllib.parse
 
@@ -110,3 +109,7 @@ class GuiManager:
     @staticmethod
     def setToastNotification(heading, message, time=5000, icon=None):
         xbmcgui.Dialog().notification(heading=heading, message=message, time=time, icon=icon)
+
+    @staticmethod
+    def MsgBoxYesNo(heading, message, nolabel=None, yeslabel=None):
+        return xbmcgui.Dialog().yesno(heading=heading, message=message, nolabel=nolabel, yeslabel=yeslabel)

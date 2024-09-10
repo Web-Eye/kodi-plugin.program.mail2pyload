@@ -108,6 +108,14 @@ msgctxt "#30210"
 msgid "PYLOAD_DELETED_SUCCESFULLY"
 msgstr "Erfolgreich gelöscht"
 
+msgctxt "#30211"
+msgid "PYLOAD_QUESTION"
+msgstr "Bestätigung"
+
+msgctxt "#30212"
+msgid "PYLOAD_DELETE_CONFIRMATION"
+msgstr "Das Paket scheint noch nicht fertiggestellt zu sein, soll es wirklich gelöscht werden?"
+
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"
 msgstr "IMAP Einstellungen"

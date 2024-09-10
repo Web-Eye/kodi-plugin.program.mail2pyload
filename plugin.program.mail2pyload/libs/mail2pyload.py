@@ -25,6 +25,7 @@ import urllib.parse
 import requests
 from _socket import gaierror
 
+import xbmc
 from libs.core.mailParser import mailParser
 from libs.core.pyloadAPI import pyloadAPI
 from libs.kodion.gui_manager import *
@@ -371,18 +372,37 @@ class mail2pyload:
     def deletePyloadPackage(self, **kwargs):
         pid = kwargs.get('tag')
 
-        # TODO: if package not finished, do a msgbox to verify the deletion
-
         try:
-
             api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
-            response = api.deletePackage(pid=pid)
 
+            response = api.getPackageInfo(pid=pid)
             if not response is None and response.status_code == 200:
-                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
-                                                      self._t.getString(PYLOAD_DELETED_SUCCESFULLY), icon=self._OK_ICON)
 
-                xbmc.executebuiltin('Container.Refresh')
+                doit = True
+                data = json.loads(response.text)
+
+                sizetotal = 0
+                sizedone = 0
+                if not data['sizetotal'] is None:
+                    sizetotal = data['sizetotal']
+
+                if not data['sizedone'] is None:
+                    sizedone = data['sizedone']
+
+                if sizetotal == 0 or (sizetotal > 0 and sizedone < sizetotal):
+                    doit = self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION))
+
+                if doit:
+                    response = api.deletePackage(pid=pid)
+
+                    if not response is None and response.status_code == 200:
+                        self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                              self._t.getString(PYLOAD_DELETED_SUCCESFULLY), icon=self._OK_ICON)
+
+                        xbmc.executebuiltin('Container.Refresh')
+
+                    else:
+                        self.handlePyLoadErrorResponse(response)
 
             else:
                 self.handlePyLoadErrorResponse(response)
