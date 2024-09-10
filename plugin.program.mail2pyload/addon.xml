@@ -21,7 +21,7 @@
     <website>https://github.com/Web-Eye/kodi-plugin.program.mail2pyload</website>
     <source>https://github.com/Web-Eye/kodi-plugin.program.mail2pyload</source>
     <summary lang="de">[Kodi](https://kodi.tv/) plugin um ein IMAP Verzeichis auszulese, nach hosting links zu suchen und einem [pyLoad](https://pyload.net/) Paket hinzuzufügen.</summary>
-    <summary lang="en">[Kodi](https://kodi.tv/) plugin to readout a imap mail folder, parse for hosting links and add them to a [pyLoad](https://pyload.net/) package.</summary>
+    <summary lang="en">[Kodi](https://kodi.tv/) plugin to read out an imap mail folder, parse for hosting links and add them to a [pyLoad](https://pyload.net/) package.</summary>
     <disclaimer lang="en_GB">Use at your own risk. Post suggestions, improvements or bug reports directly to GitHub.</disclaimer>
     <disclaimer lang="de_DE">Benutzung auf eigene Gefahr. Anregungen, Verbesserungen oder Bugs bitte direkt über GitHub posten.</disclaimer>
     <assets>
