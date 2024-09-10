@@ -92,6 +92,22 @@ msgctxt "#30206"
 msgid "PYLOAD_STATUS_CODE"
 msgstr "pyLoad antwortet:"
 
+msgctxt "#30207"
+msgid "PYLOAD_NOTIFICATION"
+msgstr "pyLoad Benachrichtigung"
+
+msgctxt "#30208"
+msgid "PYLOAD_ADDED_SUCCESFULLY"
+msgstr "Erfolgreich hinzugefügt"
+
+msgctxt "#30209"
+msgid "PYLOAD_MOVED_SUCCESFULLY"
+msgstr "Erfolgreich verschoben"
+
+msgctxt "#30210"
+msgid "PYLOAD_DELETED_SUCCESFULLY"
+msgstr "Erfolgreich gelöscht"
+
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"
 msgstr "IMAP Einstellungen"

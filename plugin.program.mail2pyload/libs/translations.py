@@ -34,6 +34,10 @@ PYLOAD_ADDTO_PACKAGE = 'pyload_addto_package'
 PYLOAD_MOVETO_QUEUE = 'pyload_moveto_queue'
 PYLOAD_MOVETO_COLLECTOR = 'pyload_moveto_collector'
 PYLOAD_DELETE_PACKAGE = 'pyload_delete_package'
+PYLOAD_NOTIFICATION = 'pyload_notification'
+PYLOAD_ADDED_SUCCESFULLY = 'pyload_added_succesfully'
+PYLOAD_MOVED_SUCCESFULLY = 'pyload_moved_succesfully'
+PYLOAD_DELETED_SUCCESFULLY = 'pyload_deleted_succesfully'
 
 class Translations:
 
@@ -61,6 +65,10 @@ class Translations:
             PYLOAD_ADDTO_PACKAGE:       self._language(30108),
             PYLOAD_MOVETO_QUEUE:        self._language(30109),
             PYLOAD_MOVETO_COLLECTOR:    self._language(30110),
-            PYLOAD_DELETE_PACKAGE:      self._language(30111)
+            PYLOAD_DELETE_PACKAGE:      self._language(30111),
+            PYLOAD_NOTIFICATION:        self._language(30207),
+            PYLOAD_ADDED_SUCCESFULLY:   self._language(30208),
+            PYLOAD_MOVED_SUCCESFULLY:   self._language(30209),
+            PYLOAD_DELETED_SUCCESFULLY: self._language(30210),
 
         }[name]

@@ -50,6 +50,9 @@ class mail2pyload:
         self._DEFAULT_IMAGE_URL = ''
         self._t = Translations(addon)
 
+        self._ERROR_ICON = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-error.jpg'
+        self._OK_ICON = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-ok.jpg'
+
         self._IMAP_SERVER = addon.getSetting('imap_server')
         self._IMAP_PORT = int(addon.getSetting('imap_port'))
         self._IMAP_USERNAME = addon.getSetting('imap_username')
@@ -186,7 +189,7 @@ class mail2pyload:
 
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(SERVER_NOT_REACHABLE))
+                                                  self._t.getString(SERVER_NOT_REACHABLE),image=self._ERROR_ICON)
 
 
     def setPyloadPackageContentView(self, **kwargs):
@@ -231,11 +234,11 @@ class mail2pyload:
                                               args=self._buildArgs(method='list', param='MAILDETAIL', tag=tag))
 
         except gaierror:
-            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_NOT_REACHABLE),image=self._ERROR_ICON)
         except ConnectionRefusedError:
-            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED),image=self._ERROR_ICON)
         except imaplib.IMAP4.error as e:
-            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],image=self._ERROR_ICON)
 
 
     def showEntity(self, **kwargs):
@@ -274,11 +277,11 @@ class mail2pyload:
 
 
         except gaierror:
-            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_NOT_REACHABLE),image=self._ERROR_ICON)
         except ConnectionRefusedError:
-            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED))
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED),image=self._ERROR_ICON)
         except imaplib.IMAP4.error as e:
-            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0])
+            self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],image=self._ERROR_ICON)
 
     def addEntity(self, **kwargs):
         param = kwargs.get('param')
@@ -311,13 +314,13 @@ class mail2pyload:
             else:
                 response = api.addFiles(pid, tag)
 
-            # TODO: set Notification, if succeed
-
-            if response is None or response.status_code != 200:
+            if not response is None and response.status_code == 200:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION), self._t.getString(PYLOAD_ADDED_SUCCESFULLY),image=self._OK_ICON)
+            else:
                 self.handlePyLoadErrorResponse(response)
 
         except requests.exceptions.ConnectionError as e:
-            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR), self._t.getString(SERVER_NOT_REACHABLE))
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR), self._t.getString(SERVER_NOT_REACHABLE),image=self._ERROR_ICON)
 
     def moveEntity(self, **kwargs):
         param = kwargs.get('param')
@@ -350,17 +353,19 @@ class mail2pyload:
             api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
             response = api.movePackage(pid=pid, destination=dest)
 
-            # TODO: set Notification, if succeed
             # TODO: reload screen, if succed
 
-            if response is None or response.status_code != 200:
+            if not response is None and response.status_code == 200:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                      self._t.getString(PYLOAD_MOVED_SUCCESFULLY), image=self._OK_ICON)
+            else:
                 self.handlePyLoadErrorResponse(response)
 
 
 
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(SERVER_NOT_REACHABLE))
+                                                  self._t.getString(SERVER_NOT_REACHABLE),image=self._ERROR_ICON)
 
 
     def deletePyloadPackage(self, **kwargs):
@@ -372,25 +377,30 @@ class mail2pyload:
 
             api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
             response = api.deletePackage(pid=pid)
+
+            if not response is None and response.status_code == 200:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                      self._t.getString(PYLOAD_DELETED_SUCCESFULLY), image=self._OK_ICON)
+
             if response is None or response.status_code != 200:
                 self.handlePyLoadErrorResponse(response)
 
-            # TODO: set Notification, if succeed
+
             # TODO: reload screen, if succed
 
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(SERVER_NOT_REACHABLE))
+                                                  self._t.getString(SERVER_NOT_REACHABLE),image=self._ERROR_ICON)
 
 
     def handlePyLoadErrorResponse(self, response):
         if not response is None:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(PYLOAD_STATUS_CODE) + f' ({response.status_code}) {response.reason}')
+                                                  self._t.getString(PYLOAD_STATUS_CODE) + f' ({response.status_code}) {response.reason}',image=self._ERROR_ICON)
 
         else:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(PYLOAD_ERROR_UMNKOWN))
+                                                  self._t.getString(PYLOAD_ERROR_UMNKOWN),image=self._ERROR_ICON)
 
     @staticmethod
     def _buildArgs(**kwargs):
