@@ -353,11 +353,11 @@ class mail2pyload:
             api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
             response = api.movePackage(pid=pid, destination=dest)
 
-            # TODO: reload screen, if succed
-
             if not response is None and response.status_code == 200:
                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
                                                       self._t.getString(PYLOAD_MOVED_SUCCESFULLY), image=self._OK_ICON)
+
+                xbmc.executebuiltin('Container.Refresh')
             else:
                 self.handlePyLoadErrorResponse(response)
 
@@ -382,11 +382,10 @@ class mail2pyload:
                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
                                                       self._t.getString(PYLOAD_DELETED_SUCCESFULLY), image=self._OK_ICON)
 
-            if response is None or response.status_code != 200:
+                xbmc.executebuiltin('Container.Refresh')
+
+            else:
                 self.handlePyLoadErrorResponse(response)
-
-
-            # TODO: reload screen, if succed
 
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
