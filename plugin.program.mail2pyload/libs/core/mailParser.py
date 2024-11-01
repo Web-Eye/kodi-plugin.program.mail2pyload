@@ -73,7 +73,9 @@ class mailParser:
                     content = BeautifulSoup(body, 'html.parser')
                     images = content.findAll('img')
                     for i in images:
-                        item['images'].append(i['src'])
+                        image = i.get('src')
+                        if image is not None:
+                            item['images'].append(image)
 
                     # detailBlock = content.findAll('div', class_='content')
                     detailBlock = content.find('div', id=re.compile('news.*'))
