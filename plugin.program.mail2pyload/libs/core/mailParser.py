@@ -20,6 +20,7 @@ import email
 import re
 from email.header import make_header, decode_header
 from bs4 import BeautifulSoup
+import base64
 
 
 class mailParser:
@@ -68,7 +69,8 @@ class mailParser:
                         body = single.decode(encoding=msg_encoding)
                     else:
                         multi = message.get_payload()[0]
-                        body = multi.get_payload(decode=True).decode(encoding=msg_encoding)
+                        body = self._getBody(multi, msg_encoding)
+                        # body = multi.get_payload(decode=True).decode(encoding=msg_encoding)
 
                     content = BeautifulSoup(body, 'html.parser')
                     images = content.findAll('img')
@@ -145,3 +147,11 @@ class mailParser:
 
             val1, val2 = imapCon.uid('store', uid, arg1, arg2)
             imapCon.logout()
+
+    @staticmethod
+    def _getBody(payload, msg_encoding):
+        enc = payload['Content-Transfer-Encoding']
+        if enc != 'base64':
+            return payload.get_payload(decode=True).decode(encoding=msg_encoding)
+        else:
+            return base64.b64decode(payload.get_payload())
