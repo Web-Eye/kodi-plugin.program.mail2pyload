@@ -84,3 +84,10 @@ class pyloadAPI:
         }
         payload = {k: json.dumps(v) for k, v in data.items()}
         return self._session.post(f'{self._baseURL}getPackageInfo', headers=self._headers, data=payload)
+
+    def getPackageData(self, pid):
+        data = {
+            'package_id': pid
+        }
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}getPackageData', headers=self._headers, data=payload)

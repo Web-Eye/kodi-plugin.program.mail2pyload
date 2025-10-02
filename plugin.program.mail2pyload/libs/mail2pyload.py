@@ -184,7 +184,8 @@ class mail2pyload:
                         ]
 
                         self._guiManager.addDirectory(title=name, poster=self._ICON, contextmenu=contextmenu,
-                                                      args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL'))
+                                                      args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL',
+                                                                           tag=item['pid']))
 
             else:
                 self.handlePyLoadErrorResponse(response)
@@ -195,7 +196,36 @@ class mail2pyload:
 
 
     def setPyloadPackageContentView(self, **kwargs):
-        pass
+        param = kwargs.get('param')
+        pid = kwargs.get('tag')
+
+        try:
+            response = self._api.getPackageData(pid)
+            if not response is None and response.status_code == 200:
+                if response.text:
+                    data = json.loads(response.text)
+                    if 'links' in data:
+                        for item in data['links']:
+                            name = item['name']
+                            fid = item['fid']
+                            size = item['format_size']
+                            plugin = item['plugin']
+                            status = item['statusmsg']
+                            error = item['error']
+
+                            if error != '':
+                                title = f'[{error}] {name} ({size})'
+                            else:
+                                title = f'[{status}] {name} ({size})'
+
+                            self._guiManager.addDirectory(title=title, poster=self._ICON,
+                                                          args=self._buildArgs()
+                                                          )
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE),icon=self._ERROR_ICON)
+
 
     def setMailView(self, **kwargs):
         page = kwargs.get('page')
