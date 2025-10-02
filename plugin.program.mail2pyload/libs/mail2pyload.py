@@ -67,6 +67,8 @@ class mail2pyload:
         self._PYLOAD_USERNAME = addon.getSetting('pyload_username')
         self._PYLOAD_PASSWORD = addon.getSetting('pyload_password')
 
+        self._api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+
         self._PYLOAD_DEFAULT_PACKAGE_NAME = addon.getSetting('pyload_default_package_name')
 
         self._guiManager = GuiManager(sys.argv[1], self._ADDON_ID, self._DEFAULT_IMAGE_URL, self._FANART)
@@ -144,12 +146,11 @@ class mail2pyload:
 
         try:
 
-            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
             response = None
             if param == 'PYLOAD_QUEUE':
-                response = api.getQueue()
+                response = self._api.getQueue()
             elif param == 'PYLOAD_COLLECTOR':
-                response = api.getCollector()
+                response = self._api.getCollector()
 
             if not response is None and response.status_code == 200:
                 if response.text:
@@ -296,8 +297,7 @@ class mail2pyload:
         tag = self._base64Decode(tag)
 
         try:
-            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
-            response = api.getCollector()
+            response = self._api.getCollector()
             pid = 0
 
             if not response is None and response.status_code == 200:
@@ -311,9 +311,9 @@ class mail2pyload:
                 self.handlePyLoadErrorResponse(response)
 
             if pid == 0:
-                response = api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, tag)
+                response = self._api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, tag)
             else:
-                response = api.addFiles(pid, tag)
+                response = self._api.addFiles(pid, tag)
 
             if not response is None and response.status_code == 200:
                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION), self._t.getString(PYLOAD_ADDED_SUCCESFULLY),icon=self._OK_ICON)
@@ -351,8 +351,7 @@ class mail2pyload:
 
         try:
 
-            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
-            response = api.movePackage(pid=pid, destination=dest)
+            response = self._api.movePackage(pid=pid, destination=dest)
 
             if not response is None and response.status_code == 200:
                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
@@ -373,9 +372,7 @@ class mail2pyload:
         pid = kwargs.get('tag')
 
         try:
-            api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
-
-            response = api.getPackageInfo(pid=pid)
+            response = self._api.getPackageInfo(pid=pid)
             if not response is None and response.status_code == 200:
 
                 doit = True
@@ -393,7 +390,7 @@ class mail2pyload:
                     doit = self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION))
 
                 if doit:
-                    response = api.deletePackage(pid=pid)
+                    response = self._api.deletePackage(pid=pid)
 
                     if not response is None and response.status_code == 200:
                         self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
