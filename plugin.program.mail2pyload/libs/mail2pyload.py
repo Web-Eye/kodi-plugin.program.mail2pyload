@@ -214,11 +214,16 @@ class mail2pyload:
                             error = item['error']
 
                             if error != '':
-                                title = f'[{error}] {name} ({size})'
+                                plot = f'[B]Name[/B]: {name}\n[B]Status[/B]: {status}\n[B]Size[/B]: {size}\n[B]Plugin[/B]: {plugin}\n[B]Error[/B]: {error}'
                             else:
-                                title = f'[{status}] {name} ({size})'
+                                plot = f'[B]Name[/B]: {name}\n[B]Status[/B]: {status}\n[B]Size[/B]: {size}\n[B]Plugin[/B]: {plugin}'
 
-                            self._guiManager.addDirectory(title=title, poster=self._ICON,
+                            infoLabels = {
+                                'Title': name,
+                                'Plot': plot
+                            }
+
+                            self._guiManager.addDirectory(title=name, poster=self._ICON, _type='video', infoLabels=infoLabels,
                                                           args=self._buildArgs()
                                                           )
 
