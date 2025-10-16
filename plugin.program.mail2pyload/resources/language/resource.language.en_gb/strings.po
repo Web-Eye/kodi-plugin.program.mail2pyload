@@ -50,7 +50,7 @@ msgstr "Collector"
 
 msgctxt "#30108"
 msgid "PYLOAD_ADDTO_PACKAGE"
-msgstr "Add to pyLoad Paket"
+msgstr "Add to pyLoad Package"
 
 msgctxt "#30109"
 msgid "PYLOAD_MOVETO_QUEUE"
@@ -63,6 +63,10 @@ msgstr "Move to the Collector"
 msgctxt "#30111"
 msgid "PYLOAD_DELETE_PACKAGE"
 msgstr "Delete Package"
+
+msgctxt "#30112"
+msgid "PYLOAD_ADDALLTO_PACKAGE"
+msgstr "Add All to pyLoad Package"
 
 msgctxt "#30200"
 msgid "ERROR"

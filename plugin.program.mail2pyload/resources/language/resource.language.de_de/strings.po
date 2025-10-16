@@ -64,6 +64,10 @@ msgctxt "#30111"
 msgid "PYLOAD_DELETE_PACKAGE"
 msgstr "Lösche Paket"
 
+msgctxt "#30112"
+msgid "PYLOAD_ADDALLTO_PACKAGE"
+msgstr "Sende Alles zu pyLoad Paket"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"

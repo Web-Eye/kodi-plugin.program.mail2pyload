@@ -15,6 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 import base64
+import binascii
 import imaplib
 import json
 import sys
@@ -240,6 +241,10 @@ class mail2pyload:
 
             p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
             mails = p.getNewMails()
+
+            mails_tag = json.dumps(mails)
+            mails_tag = self._base64Encode(mails_tag)
+
             for mail in mails:
                 poster = self._ICON
                 if len(mail['images']) > 0:
@@ -260,10 +265,15 @@ class mail2pyload:
                 deleted_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                     self._buildArgs(method='markmail', param='DELETED', tag=mail['uid']))
 
+                add_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                    self._buildArgs(method='addall', param='PYLOAD_PACKAGE', tag=mails_tag))
+
+
                 contextmenu = [
                     (self._t.getString(MARK_MAIL_SEEN), f'RunPlugin("{seen_url}")'),
                     (self._t.getString(MARK_MAIL_DONE), f'RunPlugin("{done_url}")'),
                     (self._t.getString(MARK_MAIL_DELETED), f'RunPlugin("{deleted_url}")'),
+                    (self._t.getString(PYLOAD_ADDALLTO_PACKAGE), f'RunPlugin("{add_url}")'),
                 ]
 
                 self._guiManager.addDirectory(title=mail['subject'], poster=poster, infoLabels=infoLabels, _type='video',
@@ -276,6 +286,21 @@ class mail2pyload:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), self._t.getString(SERVER_REFUSED),icon=self._ERROR_ICON)
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
+
+    def addMails(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        if tag:
+            mails = self._base64Decode(tag)
+            mails = json.loads(mails)
+
+            for mail in mails:
+                if 'packages' in mail:
+                    for package in mail['packages']:
+                        if 'hosters' in package and len(package['hosters']) > 0:
+                            if 'link' in package['hosters'][0]:
+                                self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
 
 
     def showEntity(self, **kwargs):
@@ -329,7 +354,13 @@ class mail2pyload:
         }[param](tag=tag)
 
     def addPyLoadPackage(self, tag):
-        tag = self._base64Decode(tag)
+        try:
+            tag = self._base64Decode(tag)
+        except UnicodeDecodeError as e:
+            pass
+
+        except binascii.Error as e1:
+            pass
 
         try:
             response = self._api.getCollector()
@@ -519,6 +550,7 @@ class mail2pyload:
             'show':         self.showEntity,
             'markmail':     self.markMail,
             'add':          self.addEntity,
+            'addall':       self.addMails,
             'move':         self.moveEntity,
             'delete':       self.deleteEntity
         }[method](param=param, page=page, tag=tag, navigation=navigation)
