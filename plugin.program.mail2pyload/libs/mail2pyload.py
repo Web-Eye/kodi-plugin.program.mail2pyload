@@ -258,10 +258,10 @@ class mail2pyload:
                 tag = json.dumps(mail)
                 tag = self._base64Encode(tag)
 
-                seen_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
-                    self._buildArgs(method='markmail', param='SEEN', tag=mail['uid']))
-                done_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
-                    self._buildArgs(method='markmail', param='DONE', tag=mail['uid']))
+                # seen_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                #     self._buildArgs(method='markmail', param='SEEN', tag=mail['uid']))
+                # done_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                #     self._buildArgs(method='markmail', param='DONE', tag=mail['uid']))
                 deleted_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                     self._buildArgs(method='markmail', param='DELETED', tag=mail['uid']))
 
@@ -273,10 +273,10 @@ class mail2pyload:
 
 
                 contextmenu = [
-                    (self._t.getString(MARK_MAIL_SEEN), f'RunPlugin("{seen_url}")'),
-                    (self._t.getString(MARK_MAIL_DONE), f'RunPlugin("{done_url}")'),
-                    (self._t.getString(MARK_MAIL_DELETED), f'RunPlugin("{deleted_url}")'),
+                    # (self._t.getString(MARK_MAIL_SEEN), f'RunPlugin("{seen_url}")'),
+                    # (self._t.getString(MARK_MAIL_DONE), f'RunPlugin("{done_url}")'),
                     (self._t.getString(PYLOAD_ADDALLTO_PACKAGE), f'RunPlugin("{add_url}")'),
+                    (self._t.getString(MARK_MAIL_DELETED), f'RunPlugin("{deleted_url}")'),
                     (self._t.getString(MARK_ALLMAIL_DELETED), f'RunPlugin("{delete_all_url}")'),
                 ]
 
