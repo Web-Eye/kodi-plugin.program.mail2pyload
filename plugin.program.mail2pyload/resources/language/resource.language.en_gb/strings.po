@@ -68,6 +68,10 @@ msgctxt "#30112"
 msgid "PYLOAD_ADDALLTO_PACKAGE"
 msgstr "Add All to pyLoad Package"
 
+msgctxt "#30113"
+msgid "MARK_ALLMAIL_DELETED"
+msgstr "Delete All Mails"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"

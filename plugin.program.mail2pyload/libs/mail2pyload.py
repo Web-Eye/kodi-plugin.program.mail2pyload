@@ -266,7 +266,10 @@ class mail2pyload:
                     self._buildArgs(method='markmail', param='DELETED', tag=mail['uid']))
 
                 add_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
-                    self._buildArgs(method='addall', param='PYLOAD_PACKAGE', tag=mails_tag))
+                    self._buildArgs(method='addall', param=None, tag=mails_tag))
+
+                delete_all_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                    self._buildArgs(method='deleteall', param=None, tag=mails_tag))
 
 
                 contextmenu = [
@@ -274,6 +277,7 @@ class mail2pyload:
                     (self._t.getString(MARK_MAIL_DONE), f'RunPlugin("{done_url}")'),
                     (self._t.getString(MARK_MAIL_DELETED), f'RunPlugin("{deleted_url}")'),
                     (self._t.getString(PYLOAD_ADDALLTO_PACKAGE), f'RunPlugin("{add_url}")'),
+                    (self._t.getString(MARK_ALLMAIL_DELETED), f'RunPlugin("{delete_all_url}")'),
                 ]
 
                 self._guiManager.addDirectory(title=mail['subject'], poster=poster, infoLabels=infoLabels, _type='video',
@@ -301,6 +305,20 @@ class mail2pyload:
                         if 'hosters' in package and len(package['hosters']) > 0:
                             if 'link' in package['hosters'][0]:
                                 self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
+
+    def deleteMails(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        if tag:
+            mails = self._base64Decode(tag)
+            mails = json.loads(mails)
+
+            for mail in mails:
+                uid = mail.get('uid')
+                if uid:
+                    self.markMail(param = 'DELETED', tag = str(uid))
+
 
 
     def showEntity(self, **kwargs):
@@ -551,6 +569,7 @@ class mail2pyload:
             'markmail':     self.markMail,
             'add':          self.addEntity,
             'addall':       self.addMails,
+            'deleteall':    self.deleteMails,
             'move':         self.moveEntity,
             'delete':       self.deleteEntity
         }[method](param=param, page=page, tag=tag, navigation=navigation)

@@ -27,6 +27,7 @@ SERVER_REFUSED = 'imap_server_not_reachable'
 MARK_MAIL_SEEN = 'mark_mail_seen'
 MARK_MAIL_DONE = 'mark_mail_done'
 MARK_MAIL_DELETED = 'mark_mail_deleted'
+MARK_ALLMAIL_DELETED = 'mark_allmail_deleted'
 PYLOAD_ERROR = 'pyload_error'
 PYLOAD_ERROR_UMNKOWN = 'pyload_error_unkown'
 PYLOAD_STATUS_CODE = 'pyload_status_code'
@@ -65,6 +66,7 @@ class Translations:
             MARK_MAIL_SEEN:             self._language(30103),
             MARK_MAIL_DONE:             self._language(30104),
             MARK_MAIL_DELETED:          self._language(30105),
+            MARK_ALLMAIL_DELETED:       self._language(30113),
             PYLOAD_ADDTO_PACKAGE:       self._language(30108),
             PYLOAD_ADDALLTO_PACKAGE:    self._language(30112),
             PYLOAD_MOVETO_QUEUE:        self._language(30109),
