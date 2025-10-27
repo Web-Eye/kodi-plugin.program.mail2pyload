@@ -250,10 +250,17 @@ class mail2pyload:
                 if len(mail['images']) > 0:
                     poster=mail['images'][0]
 
+                package_count = 0
+                if 'packages' in mail:
+                    package_count = len(mail['packages'])
+
                 infoLabels = {
                     'Title': mail['subject'],
-                    'Plot': mail['description']
+                    'Plot': f'[B]Package Count[/B]: {package_count}\n' + mail['description']
                 }
+
+                if package_count > 1:
+                    infoLabels['Plot'] = f'[COLOR red][B]Package Count[/B]: {package_count}[/COLOR]\n' + mail['description']
 
                 tag = json.dumps(mail)
                 tag = self._base64Encode(tag)
