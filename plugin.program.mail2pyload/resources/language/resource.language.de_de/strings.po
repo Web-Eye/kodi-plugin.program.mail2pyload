@@ -124,6 +124,10 @@ msgctxt "#30212"
 msgid "PYLOAD_DELETE_CONFIRMATION"
 msgstr "Das Paket scheint noch nicht fertiggestellt zu sein, soll es wirklich gelöscht werden?"
 
+msgctxt "#30213"
+msgid "PYLOAD_DELETE_ALL_MAILS_CONFIRMATION"
+msgstr "Sollen alle Nachrichten gelöscht werden?"
+
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"
 msgstr "IMAP Einstellungen"

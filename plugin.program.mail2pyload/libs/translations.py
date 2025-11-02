@@ -42,6 +42,7 @@ PYLOAD_MOVED_SUCCESFULLY = 'pyload_moved_succesfully'
 PYLOAD_DELETED_SUCCESFULLY = 'pyload_deleted_succesfully'
 PYLOAD_QUESTION = 'pyload_question'
 PYLOAD_DELETE_CONFIRMATION = 'pyload_delete_confirmation'
+PYLOAD_DELETE_ALL_MAILS_CONFIRMATION = 'pyload_delete_all_mails_confirmation'
 
 class Translations:
 
@@ -51,32 +52,33 @@ class Translations:
     def getString(self, name):
 
         return {
-            HOME:                       self._language(30100),
-            NEW_MAIL:                   self._language(30101),
-            PYLOAD_PACKAGE:             self._language(30102),
-            PYLOAD_QUEUE:               self._language(30106),
-            PYLOAD_COLLECTOR:           self._language(30107),
-            ERROR:                      self._language(30200),
-            IMAP_ERROR:                 self._language(30201),
-            SERVER_NOT_REACHABLE:       self._language(30202),
-            SERVER_REFUSED:             self._language(30203),
-            PYLOAD_ERROR:               self._language(30204),
-            PYLOAD_ERROR_UMNKOWN:       self._language(30205),
-            PYLOAD_STATUS_CODE:         self._language(30206),
-            MARK_MAIL_SEEN:             self._language(30103),
-            MARK_MAIL_DONE:             self._language(30104),
-            MARK_MAIL_DELETED:          self._language(30105),
-            MARK_ALLMAIL_DELETED:       self._language(30113),
-            PYLOAD_ADDTO_PACKAGE:       self._language(30108),
-            PYLOAD_ADDALLTO_PACKAGE:    self._language(30112),
-            PYLOAD_MOVETO_QUEUE:        self._language(30109),
-            PYLOAD_MOVETO_COLLECTOR:    self._language(30110),
-            PYLOAD_DELETE_PACKAGE:      self._language(30111),
-            PYLOAD_NOTIFICATION:        self._language(30207),
-            PYLOAD_ADDED_SUCCESFULLY:   self._language(30208),
-            PYLOAD_MOVED_SUCCESFULLY:   self._language(30209),
-            PYLOAD_DELETED_SUCCESFULLY: self._language(30210),
-            PYLOAD_QUESTION:            self._language(30211),
-            PYLOAD_DELETE_CONFIRMATION: self._language(30212)
+            HOME:                                   self._language(30100),
+            NEW_MAIL:                               self._language(30101),
+            PYLOAD_PACKAGE:                         self._language(30102),
+            PYLOAD_QUEUE:                           self._language(30106),
+            PYLOAD_COLLECTOR:                       self._language(30107),
+            ERROR:                                  self._language(30200),
+            IMAP_ERROR:                             self._language(30201),
+            SERVER_NOT_REACHABLE:                   self._language(30202),
+            SERVER_REFUSED:                         self._language(30203),
+            PYLOAD_ERROR:                           self._language(30204),
+            PYLOAD_ERROR_UMNKOWN:                   self._language(30205),
+            PYLOAD_STATUS_CODE:                     self._language(30206),
+            MARK_MAIL_SEEN:                         self._language(30103),
+            MARK_MAIL_DONE:                         self._language(30104),
+            MARK_MAIL_DELETED:                      self._language(30105),
+            MARK_ALLMAIL_DELETED:                   self._language(30113),
+            PYLOAD_ADDTO_PACKAGE:                   self._language(30108),
+            PYLOAD_ADDALLTO_PACKAGE:                self._language(30112),
+            PYLOAD_MOVETO_QUEUE:                    self._language(30109),
+            PYLOAD_MOVETO_COLLECTOR:                self._language(30110),
+            PYLOAD_DELETE_PACKAGE:                  self._language(30111),
+            PYLOAD_NOTIFICATION:                    self._language(30207),
+            PYLOAD_ADDED_SUCCESFULLY:               self._language(30208),
+            PYLOAD_MOVED_SUCCESFULLY:               self._language(30209),
+            PYLOAD_DELETED_SUCCESFULLY:             self._language(30210),
+            PYLOAD_QUESTION:                        self._language(30211),
+            PYLOAD_DELETE_CONFIRMATION:             self._language(30212),
+            PYLOAD_DELETE_ALL_MAILS_CONFIRMATION:   self._language(30213)
 
         }[name]

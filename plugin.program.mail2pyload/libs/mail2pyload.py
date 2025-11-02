@@ -313,11 +313,16 @@ class mail2pyload:
                             if 'link' in package['hosters'][0]:
                                 self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
 
+            self.deleteMails(param=param, tag=tag)
+
     def deleteMails(self, **kwargs):
         param = kwargs.get('param')
         tag = kwargs.get('tag')
 
-        if tag:
+        doit = tag and self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION),
+                                            message=self._t.getString(PYLOAD_DELETE_ALL_MAILS_CONFIRMATION))
+
+        if doit:
             mails = self._base64Decode(tag)
             mails = json.loads(mails)
 
