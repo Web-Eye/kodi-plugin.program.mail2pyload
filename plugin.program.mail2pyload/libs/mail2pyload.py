@@ -184,7 +184,18 @@ class mail2pyload:
                             (self._t.getString(PYLOAD_DELETE_PACKAGE), f'RunPlugin("{delete_url}")'),
                         ]
 
-                        self._guiManager.addDirectory(title=name, poster=self._ICON, contextmenu=contextmenu,
+                        plot = (f"[B]Link Count[/B]: {item['linksdone']} / {item['linkstotal']}\n"
+                                f"[B]Size[/B]: {self._formatSize(item['sizedone'])} / {self._formatSize(item['sizetotal'])}")
+
+
+
+                        infoLabels = {
+                            'Title': name,
+                            'Plot': plot
+                        }
+
+                        self._guiManager.addDirectory(title=name, poster=self._ICON, _type='video', infoLabels=infoLabels,
+                                                      contextmenu=contextmenu,
                                                       args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL',
                                                                            tag=item['pid']))
 
@@ -561,6 +572,39 @@ class mail2pyload:
         for key in args:
             args[key] = args[key][0]
         return args
+
+    @staticmethod
+    def _formatSize(b):
+        i = 0
+        while b > 1024:
+            i += 1
+            b /= 1024
+
+        if i > 0:
+            b = '{:.2f}'.format(b)
+
+        if i == 0:
+            return f'{b} B'
+        elif i == 1:
+            return f'{b} KiB'
+        elif i == 2:
+            return f'{b} MiB'
+        elif i == 3:
+            return f'{b} GiB'
+        elif i == 4:
+            return f'{b} TiB'
+        elif i == 5:
+            return f'{b} PiB'
+        elif i == 6:
+            return f'{b} EiB'
+        elif i == 7:
+            return f'{b} ZiB'
+        elif i == 8:
+            return f'{b} YiB'
+
+        return None
+
+
 
     def run(self):
         args = self._get_query_args(sys.argv[2])
