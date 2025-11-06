@@ -81,13 +81,14 @@ class mailParser:
 
                     # detailBlock = content.findAll('div', class_='content')
                     detailBlock = content.find('div', id=re.compile('news.*'))
-
+                    lastSubject = ''
 
                     test = detailBlock.find()
                     package = None
                     for t in test:
                         if t.name is None:
                             if i != '':
+                                lastSubject = t
                                 if item['description'] is None:
                                     item['description'] = t
                                 else:
@@ -116,6 +117,12 @@ class mailParser:
                                         'subject': h,
                                         'link': t['href']
                                     }
+
+                                    if not package:
+                                        package = {
+                                            'subject': lastSubject,
+                                            'hosters': []
+                                        }
 
                                     package['hosters'].append(hoster)
 
