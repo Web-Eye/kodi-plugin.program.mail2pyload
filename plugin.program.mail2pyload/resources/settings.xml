@@ -118,5 +118,64 @@
                 </setting>
             </group>
         </category>
+        <category id="database_settings" label="30800">
+            <group id="1">
+                <setting id="database_host" type="string" label="30801" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30801</heading>
+                    </control>
+                </setting>
+                <setting id="database_port" type="integer" label="30802" help="">
+                    <default>3306</default>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="integer">
+                        <heading>30802</heading>
+                    </control>
+                </setting>
+                <setting id="database_user" type="string" label="30803" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30803</heading>
+                    </control>
+                </setting>
+                <setting id="database_password" type="string" label="30804" help="">
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30804</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+                <setting id="database_name" type="string" label="30805" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30805</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
+        <category id="realdebrit_settings" label="30900">
+            <group id="1">
+                <setting id="realdebrit_token" type="string" label="30901" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30901</heading>
+                    </control>
+                </setting>
+            </group>
+        </category>
     </section>
 </settings>

@@ -25,7 +25,7 @@ import base64
 
 class mailParser:
 
-    def __init__(self, server, port, username, password, folder, hoster_whitelist, hoster_blacklist):
+    def __init__(self, server, port, username, password, folder, hoster_whitelist, hoster_blacklist, rd_hosterDict):
         self._IMAP_SERVER = server
         self._IMAP_PORT = port
         self._IMAP_USERNAME = username
@@ -33,6 +33,8 @@ class mailParser:
         self._IMAP_FOLDER = folder
         self._HOSTER_WHITELIST = hoster_whitelist
         self._HOSTER_BLACKLIST = hoster_blacklist
+        self._RD_HOSTERDICT = rd_hosterDict
+        self._COMPILED_RD_REGEX_PATTERN = self._getCompiledRDRegExPattern(self._RD_HOSTERDICT)
 
 
     def getNewMails(self):
@@ -92,7 +94,7 @@ class mailParser:
                                 if item['description'] is None:
                                     item['description'] = t
                                 else:
-                                    if package and len(package['hosters']) > 0:
+                                    if package and len(package.get('hosters')) > 0:
                                         item['packages'].append(package)
                                     package = {
                                         'subject': t,
@@ -101,21 +103,25 @@ class mailParser:
 
                         elif t.name == 'a' and t.find('img') is None and t.has_attr('href'):
                             h = ''.join(['' if ord(i) < 20 else i for i in t.getText()])
-                            if h != '' and t['href'] != '':
-                                addit = True
+                            if h != '' and t.get('href') != '':
+                                link = t.get('href')
+                                addit = False
 
                                 if self._HOSTER_WHITELIST != '':
-                                    match = re.match(self._HOSTER_WHITELIST, t['href'])
+                                    match = re.match(self._HOSTER_WHITELIST, link)
                                     addit = (not match is None)
 
+                                if not addit and len(self._RD_HOSTERDICT) > 0:
+                                    addit = self._doLinkMatch(self._COMPILED_RD_REGEX_PATTERN, link)
+
                                 if addit and self._HOSTER_BLACKLIST != '':
-                                    match = re.match(self._HOSTER_BLACKLIST, t['href'])
+                                    match = re.match(self._HOSTER_BLACKLIST, link)
                                     addit = (match is None)
 
                                 if addit:
                                     hoster = {
                                         'subject': h,
-                                        'link': t['href']
+                                        'link': link
                                     }
 
                                     if not package:
@@ -126,7 +132,7 @@ class mailParser:
 
                                     package['hosters'].append(hoster)
 
-                    if package and len(package['hosters']) > 0:
+                    if package and len(package.get('hosters')) > 0:
                         item['packages'].append(package)
 
                     if len(item['packages']) > 0:
@@ -162,3 +168,22 @@ class mailParser:
             return payload.get_payload(decode=True).decode(encoding=msg_encoding)
         else:
             return base64.b64decode(payload.get_payload())
+
+    @staticmethod
+    def _doLinkMatch(compiledRegExPattern, link):
+        return any(rx.search(link) for p, rx in compiledRegExPattern)
+
+    @staticmethod
+    def _getCompiledRDRegExPattern(hosterDict):
+        regExPatterns = []
+        for key, value in hosterDict.items():
+            patterns = value.get("regex")
+            if not patterns:
+                continue
+
+            if isinstance(patterns, list):
+                regExPatterns.extend(patterns)
+            else:
+                regExPatterns.append(patterns)
+
+        return [(p, re.compile(p, re.IGNORECASE)) for p in regExPatterns if p]

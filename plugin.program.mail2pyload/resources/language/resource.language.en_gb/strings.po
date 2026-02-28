@@ -187,3 +187,35 @@ msgstr "pyLoad Password"
 msgctxt "#30781"
 msgid "PYLOAD_DEFAULT_PACKAGE_NAME"
 msgstr "Default Package Name"
+
+msgctxt "#30800"
+msgid "database_settings"
+msgstr "Database Settings"
+
+msgctxt "#30801"
+msgid "database_host"
+msgstr "Host"
+
+msgctxt "#30802"
+msgid "database_port"
+msgstr "Port"
+
+msgctxt "#30803"
+msgid "database_user"
+msgstr "Username"
+
+msgctxt "#30804"
+msgid "database_password"
+msgstr "Password"
+
+msgctxt "#30805"
+msgid "database_Name"
+msgstr "DB Name"
+
+msgctxt "#30900"
+msgid "realdebrit_settings"
+msgstr "Realdebrit Settings"
+
+msgctxt "#30901"
+msgid "realdebrit_token"
+msgstr "Token"

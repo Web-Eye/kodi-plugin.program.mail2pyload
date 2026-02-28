@@ -33,6 +33,7 @@ from libs.core.pyloadAPI import pyloadAPI
 from libs.kodion.gui_manager import *
 from libs.kodion.addon import Addon
 from libs.translations import *
+from libs.core.databaseCore import databaseCore
 
 class mail2pyload:
 
@@ -69,7 +70,22 @@ class mail2pyload:
         self._PYLOAD_USERNAME = addon.getSetting('pyload_username')
         self._PYLOAD_PASSWORD = addon.getSetting('pyload_password')
 
+        self._DATABASE_HOST = addon.getSetting('database_host')
+        self._DATABASE_PORT = int(addon.getSetting('database_port'))
+        self._DATABASE_USER = addon.getSetting('database_user')
+        self._DATABASE_PASSWORD = addon.getSetting('database_password')
+        self._DATABASE_NAME = addon.getSetting('database_name')
+
+        self._REALDEBRIT_TOKEN = addon.getSetting('realdebrit_token')
+
         self._api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+
+        self._db = None
+        try:
+            self._db = databaseCore(host=self._DATABASE_HOST, port=self._DATABASE_PORT, user=self._DATABASE_USER,
+                                    password=self._DATABASE_PASSWORD, database=self._DATABASE_NAME)
+        finally:
+            pass
 
         self._PYLOAD_DEFAULT_PACKAGE_NAME = addon.getSetting('pyload_default_package_name')
 
@@ -251,7 +267,16 @@ class mail2pyload:
 
         try:
 
-            p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
+            rd_hosterDict = {}
+            if self._db:
+                rd_hosterlist = self._db.getrealdebritHosts()
+                if rd_hosterlist:
+                    try:
+                        rd_hosterDict = json.loads(rd_hosterlist)
+                    finally:
+                        pass
+
+            p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST, rd_hosterDict)
             mails = p.getNewMails()
 
             mails_tag = json.dumps(mails)
