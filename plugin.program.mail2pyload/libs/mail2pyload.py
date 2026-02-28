@@ -21,6 +21,7 @@ import json
 import sys
 import urllib
 import urllib.parse
+import re
 
 
 import requests
@@ -309,9 +310,25 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
+    @staticmethod
+    def _get_highest_prio_match(prios, candidates):
+        for pattern in prios:
+            regex = re.compile(pattern)
+            for s in candidates:
+                if regex.search(s):
+                    return s
+        return candidates[0]
+
     def addMails(self, **kwargs):
         param = kwargs.get('param')
         tag = kwargs.get('tag')
+
+        prios = [
+            r'https?:\/\/(\w+\.)?(?:turbobit|turbobit5|turbobita|torbobit|trbt|turbo|turbobif|turb|tbit|trbbt|turbobeet|tourbobit|turbobitn)\.(?:net|cc|pw|com|to)\/(?:download\/free\/[^\s"\'><:|]+|[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
+            r'https?:\/\/(\w+\.)?(filespace\.com\/[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
+            r'https?:\/\/(\w+\.)?(katfile\.(?:com|cloud|online)\/[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
+            r'https?:\/\/(\w+\.)?(?:ex-load\.com\/[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?'
+        ]
 
         if tag:
             mails = self._base64Decode(tag)
@@ -320,9 +337,17 @@ class mail2pyload:
             for mail in mails:
                 if 'packages' in mail:
                     for package in mail['packages']:
-                        if 'hosters' in package and len(package['hosters']) > 0:
-                            if 'link' in package['hosters'][0]:
-                                self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
+                        if 'hosters' in package:
+                            candidates =[]
+                            for hoster in package['hosters']:
+                                if 'link' in hoster:
+                                    candidates.append(hoster['link'])
+
+                            self.addEntity(param='PYLOAD_PACKAGE', tag=self._get_highest_prio_match(prios, candidates))
+
+                        #if 'hosters' in package and len(package['hosters']) > 0:
+                        #    if 'link' in package['hosters'][0]:
+                        #        self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
 
             self.deleteMails(param=param, tag=tag)
 
