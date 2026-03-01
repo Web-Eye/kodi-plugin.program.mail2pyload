@@ -128,6 +128,10 @@ msgctxt "#30213"
 msgid "PYLOAD_DELETE_ALL_MAILS_CONFIRMATION"
 msgstr "Should all Mails deleted?"
 
+msgctxt "#30214"
+msgid "PYLOAD_ERROR_CONVERTLINK"
+msgstr "Download Link couldn't be created"
+
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"
 msgstr "IMAP Settings"

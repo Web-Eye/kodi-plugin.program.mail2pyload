@@ -43,6 +43,7 @@ PYLOAD_DELETED_SUCCESFULLY = 'pyload_deleted_succesfully'
 PYLOAD_QUESTION = 'pyload_question'
 PYLOAD_DELETE_CONFIRMATION = 'pyload_delete_confirmation'
 PYLOAD_DELETE_ALL_MAILS_CONFIRMATION = 'pyload_delete_all_mails_confirmation'
+PYLOAD_ERROR_CONVERTLINK = 'pyload_error_convertlink'
 
 class Translations:
 
@@ -79,6 +80,7 @@ class Translations:
             PYLOAD_DELETED_SUCCESFULLY:             self._language(30210),
             PYLOAD_QUESTION:                        self._language(30211),
             PYLOAD_DELETE_CONFIRMATION:             self._language(30212),
-            PYLOAD_DELETE_ALL_MAILS_CONFIRMATION:   self._language(30213)
+            PYLOAD_DELETE_ALL_MAILS_CONFIRMATION:   self._language(30213),
+            PYLOAD_ERROR_CONVERTLINK:               self._language(30214),
 
         }[name]

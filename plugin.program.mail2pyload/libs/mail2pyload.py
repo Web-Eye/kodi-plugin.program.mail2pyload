@@ -30,6 +30,7 @@ from _socket import gaierror
 import xbmc
 from libs.core.mailParser import mailParser
 from libs.core.pyloadAPI import pyloadAPI
+from libs.core.realDebritCore import realdebritCore
 from libs.kodion.gui_manager import *
 from libs.kodion.addon import Addon
 from libs.translations import *
@@ -86,6 +87,10 @@ class mail2pyload:
                                     password=self._DATABASE_PASSWORD, database=self._DATABASE_NAME)
         finally:
             pass
+
+        self._rdAPI = None
+        if self._REALDEBRIT_TOKEN:
+            self._rdAPI = realdebritCore(self._REALDEBRIT_TOKEN)
 
         self._PYLOAD_DEFAULT_PACKAGE_NAME = addon.getSetting('pyload_default_package_name')
 
@@ -436,6 +441,20 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
+    def _getDownloadLink(self, link):
+        if self._HOSTER_WHITELIST != '':
+            match = re.search(self._HOSTER_WHITELIST, link)
+            if match:
+                return link
+
+        if self._rdAPI:
+            rsp = self._rdAPI.unrestrictLink(link)
+            if rsp:
+                return rsp['download']
+
+
+        return None
+
     def addEntity(self, **kwargs):
         param = kwargs.get('param')
         tag = kwargs.get('tag')
@@ -453,6 +472,12 @@ class mail2pyload:
         except binascii.Error as e1:
             pass
 
+        link = self._getDownloadLink(tag)
+        if link is None:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(PYLOAD_ERROR_CONVERTLINK), icon=self._ERROR_ICON)
+            return
+
         try:
             response = self._api.getCollector()
             pid = 0
@@ -468,9 +493,9 @@ class mail2pyload:
                 self.handlePyLoadErrorResponse(response)
 
             if pid == 0:
-                response = self._api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, tag)
+                response = self._api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, link)
             else:
-                response = self._api.addFiles(pid, tag)
+                response = self._api.addFiles(pid, link)
 
             if not response is None and response.status_code == 200:
                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION), self._t.getString(PYLOAD_ADDED_SUCCESFULLY),icon=self._OK_ICON)
