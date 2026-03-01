@@ -44,6 +44,23 @@ def getCompiledRDRegExPattern(hosterDict):
 
     return [(p, re.compile(p, re.IGNORECASE)) for p in regExPatterns if p]
 
+def compileRegExPattern(hosterDict):
+    for key, value in hosterDict.items():
+        patterns = value.get("regex")
+        if not patterns:
+            continue
+
+        compiled = []
+        for p in patterns:
+            if p:
+                try:
+                    compiled.append((p, re.compile(p, re.IGNORECASE)))
+                except re.error:
+                    pass
+        value["compiledRegExPattern"] = compiled
+
+    return hosterDict
+
 def get_highest_prio_match(prios, candidates):
     for pattern in prios:
         regex = re.compile(pattern)

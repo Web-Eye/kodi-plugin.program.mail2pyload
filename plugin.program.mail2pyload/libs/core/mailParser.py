@@ -35,7 +35,9 @@ class mailParser:
         self._HOSTER_WHITELIST = hoster_whitelist
         self._HOSTER_BLACKLIST = hoster_blacklist
         self._RD_HOSTERDICT = rd_hosterDict
-        self._COMPILED_RD_REGEX_PATTERN = getCompiledRDRegExPattern(self._RD_HOSTERDICT)
+        self._COMPILED_RD_REGEX_PATTERN = None
+        if rd_hosterDict:
+            self._COMPILED_RD_REGEX_PATTERN = getCompiledRDRegExPattern(self._RD_HOSTERDICT)
 
 
     def getNewMails(self):
@@ -112,7 +114,7 @@ class mailParser:
                                     match = re.match(self._HOSTER_WHITELIST, link)
                                     addit = (not match is None)
 
-                                if not addit and len(self._RD_HOSTERDICT) > 0:
+                                if not addit and self._RD_HOSTERDICT and len(self._RD_HOSTERDICT) > 0:
                                     addit = doLinkMatch(self._COMPILED_RD_REGEX_PATTERN, link)
 
                                 if addit and self._HOSTER_BLACKLIST != '':

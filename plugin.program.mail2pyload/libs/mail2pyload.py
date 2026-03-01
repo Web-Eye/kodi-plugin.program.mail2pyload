@@ -28,8 +28,8 @@ import requests
 from _socket import gaierror
 
 import xbmc
-from libs.common.tools import getCompiledRDRegExPattern, base64Decode, base64Encode, formatSize, get_query_args, \
-    doLinkMatch
+from libs.common.tools import base64Decode, base64Encode, formatSize, get_query_args, \
+    doLinkMatch, compileRegExPattern
 from libs.core.mailParser import mailParser
 from libs.core.pyloadAPI import pyloadAPI
 from libs.core.realDebritCore import realdebritCore
@@ -309,10 +309,6 @@ class mail2pyload:
                 tag = json.dumps(mail)
                 tag = base64Encode(tag)
 
-                # seen_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
-                #     self._buildArgs(method='markmail', param='SEEN', tag=mail['uid']))
-                # done_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
-                #     self._buildArgs(method='markmail', param='DONE', tag=mail['uid']))
                 deleted_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                     self._buildArgs(method='markmail', param='DELETED', tag=mail['uid']))
 
@@ -324,8 +320,6 @@ class mail2pyload:
 
 
                 contextmenu = [
-                    # (self._t.getString(MARK_MAIL_SEEN), f'RunPlugin("{seen_url}")'),
-                    # (self._t.getString(MARK_MAIL_DONE), f'RunPlugin("{done_url}")'),
                     (self._t.getString(PYLOAD_ADDALLTO_PACKAGE), f'RunPlugin("{add_url}")'),
                     (self._t.getString(MARK_MAIL_DELETED), f'RunPlugin("{deleted_url}")'),
                     (self._t.getString(MARK_ALLMAIL_DELETED), f'RunPlugin("{delete_all_url}")'),
@@ -342,17 +336,30 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
-    def _getPreferredHosterLink(self, candidates, rd_hosterDict, COMPILED_RD_REGEX_PATTERN):
+    def _getPreferredHosterLink(self, candidates, rd_hosterDict):
         if self._HOSTER_WHITELIST != '':
             for candidate in candidates:
                 match = re.search(self._HOSTER_WHITELIST, candidate)
                 if match:
                     return candidate
 
+        links = []
         if len(rd_hosterDict) > 0:
             for candidate in candidates:
-                if doLinkMatch(COMPILED_RD_REGEX_PATTERN, candidate):
-                    return candidate
+                for hoster in rd_hosterDict:
+                    patterns = hoster[1].get('compiledRegExPattern', [])
+                    if patterns:
+                        if doLinkMatch(patterns, candidate):
+                            traffic = hoster[1].get('traffic')
+                            if not traffic:
+                                return candidate
+                            else:
+                                links.append({ "candidate": candidate, "trafficLeft": traffic.get('left') })
+
+        if len(links) > 0:
+            best = max(links, key=lambda item: item["trafficLeft"])
+            if best:
+                return best["candidate"]
 
         return None
 
@@ -366,19 +373,17 @@ class mail2pyload:
             if rd_hosterlist:
                 try:
                     rd_hosterDict = json.loads(rd_hosterlist)
+                    rd_hosterDict = compileRegExPattern(rd_hosterDict)
+                    rd_hosterDict = sorted(
+                        rd_hosterDict.items(),
+                        key=lambda item: (
+                            item[1].get("traffic") is not None,
+                            item[1].get("traffic", {}).get("left") is None,
+                            -(item[1].get("traffic", {}).get("left") or 0)
+                        )
+                    )
                 finally:
                     pass
-
-        COMPILED_RD_REGEX_PATTERN = None
-        if len(rd_hosterDict) > 0:
-            COMPILED_RD_REGEX_PATTERN = getCompiledRDRegExPattern(rd_hosterDict)
-
-        prios = [
-            r'https?:\/\/(\w+\.)?(?:turbobit|turbobit5|turbobita|torbobit|trbt|turbo|turbobif|turb|tbit|trbbt|turbobeet|tourbobit|turbobitn)\.(?:net|cc|pw|com|to)\/(?:download\/free\/[^\s"\'><:|]+|[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
-            r'https?:\/\/(\w+\.)?(filespace\.com\/[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
-            r'https?:\/\/(\w+\.)?(katfile\.(?:com|cloud|online)\/[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
-            r'https?:\/\/(\w+\.)?(?:ex-load\.com\/[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?'
-        ]
 
         if tag:
             mails = base64Decode(tag)
@@ -394,9 +399,7 @@ class mail2pyload:
                                 if 'link' in hoster:
                                     candidates.append(hoster['link'])
 
-                            link = self._getPreferredHosterLink(candidates, rd_hosterDict, COMPILED_RD_REGEX_PATTERN)
-                            # self.addEntity(param='PYLOAD_PACKAGE', tag=self._get_highest_prio_match(prios, candidates))
-
+                            link = self._getPreferredHosterLink(candidates, rd_hosterDict)
                             if link:
                                 self.addEntity(param='PYLOAD_PACKAGE', tag=link)
                             else:
@@ -404,10 +407,6 @@ class mail2pyload:
                                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
                                                                       self._t.getString(PYLOAD_ERROR_UNKOWN),
                                                                       icon=self._ERROR_ICON)
-
-                        #if 'hosters' in package and len(package['hosters']) > 0:
-                        #    if 'link' in package['hosters'][0]:
-                        #        self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
 
             if not errorOccurs:
                 self.deleteMails(param=param, tag=tag)

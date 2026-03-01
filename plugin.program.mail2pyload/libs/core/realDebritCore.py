@@ -15,8 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 import requests
-from urllib.parse import quote
-
 
 class realdebritCore:
 
@@ -49,7 +47,6 @@ class realdebritCore:
     def unrestrictLink(self, link):
         url = "https://api.real-debrid.com/rest/1.0/unrestrict/link"
 
-        # link = quote(link, safe='=&')
         payload = f"link={link}"
 
         headers = self._headers.copy()

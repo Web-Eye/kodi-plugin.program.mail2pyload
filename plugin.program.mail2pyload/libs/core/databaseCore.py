@@ -26,7 +26,8 @@ class databaseCore:
     def __init__(self, **kwargs):
        databaseHelper.createPool(kwargs)
 
-    def getrealdebritHosts(self):
+    @staticmethod
+    def getrealdebritHosts():
         con = databaseHelper.get_connection()
         try:
             return DL_settings.getSetting(con, 'realdebrit_hosts')

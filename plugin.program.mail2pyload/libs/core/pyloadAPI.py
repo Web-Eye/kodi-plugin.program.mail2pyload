@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 import json
-
 import requests
 
 class pyloadAPI:
@@ -34,7 +33,6 @@ class pyloadAPI:
 
         self._session = requests.Session()
         self._session.post(f'{self._baseURL}login', headers=self._headers, data=payload, files=formdata)
-
 
     def getQueue(self):
         return self._session.post(f'{self._baseURL}getQueue', headers=self._headers)
