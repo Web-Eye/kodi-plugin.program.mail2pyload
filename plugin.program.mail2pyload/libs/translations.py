@@ -29,7 +29,7 @@ MARK_MAIL_DONE = 'mark_mail_done'
 MARK_MAIL_DELETED = 'mark_mail_deleted'
 MARK_ALLMAIL_DELETED = 'mark_allmail_deleted'
 PYLOAD_ERROR = 'pyload_error'
-PYLOAD_ERROR_UMNKOWN = 'pyload_error_unkown'
+PYLOAD_ERROR_UNKOWN = 'pyload_error_unkown'
 PYLOAD_STATUS_CODE = 'pyload_status_code'
 PYLOAD_ADDTO_PACKAGE = 'pyload_addto_package'
 PYLOAD_ADDALLTO_PACKAGE = 'pyload_addallto_package'
@@ -63,7 +63,7 @@ class Translations:
             SERVER_NOT_REACHABLE:                   self._language(30202),
             SERVER_REFUSED:                         self._language(30203),
             PYLOAD_ERROR:                           self._language(30204),
-            PYLOAD_ERROR_UMNKOWN:                   self._language(30205),
+            PYLOAD_ERROR_UNKOWN:                    self._language(30205),
             PYLOAD_STATUS_CODE:                     self._language(30206),
             MARK_MAIL_SEEN:                         self._language(30103),
             MARK_MAIL_DONE:                         self._language(30104),

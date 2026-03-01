@@ -93,7 +93,7 @@ msgid "PYLOAD_ERROR"
 msgstr "pyLoad Error"
 
 msgctxt "#30205"
-msgid "PYLOAD_ERROR_UMNKOWN"
+msgid "PYLOAD_ERROR_UNKOWN"
 msgstr "Unknown pyLoad Error"
 
 msgctxt "#30206"

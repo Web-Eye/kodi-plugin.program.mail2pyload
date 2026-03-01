@@ -20,7 +20,8 @@ import email
 import re
 from email.header import make_header, decode_header
 from bs4 import BeautifulSoup
-import base64
+
+from libs.common.tools import doLinkMatch, getBody, getCompiledRDRegExPattern
 
 
 class mailParser:
@@ -34,7 +35,7 @@ class mailParser:
         self._HOSTER_WHITELIST = hoster_whitelist
         self._HOSTER_BLACKLIST = hoster_blacklist
         self._RD_HOSTERDICT = rd_hosterDict
-        self._COMPILED_RD_REGEX_PATTERN = self._getCompiledRDRegExPattern(self._RD_HOSTERDICT)
+        self._COMPILED_RD_REGEX_PATTERN = getCompiledRDRegExPattern(self._RD_HOSTERDICT)
 
 
     def getNewMails(self):
@@ -71,7 +72,7 @@ class mailParser:
                         body = single.decode(encoding=msg_encoding)
                     else:
                         multi = message.get_payload()[0]
-                        body = self._getBody(multi, msg_encoding)
+                        body = getBody(multi, msg_encoding)
                         # body = multi.get_payload(decode=True).decode(encoding=msg_encoding)
 
                     content = BeautifulSoup(body, 'html.parser')
@@ -112,7 +113,7 @@ class mailParser:
                                     addit = (not match is None)
 
                                 if not addit and len(self._RD_HOSTERDICT) > 0:
-                                    addit = self._doLinkMatch(self._COMPILED_RD_REGEX_PATTERN, link)
+                                    addit = doLinkMatch(self._COMPILED_RD_REGEX_PATTERN, link)
 
                                 if addit and self._HOSTER_BLACKLIST != '':
                                     match = re.match(self._HOSTER_BLACKLIST, link)
@@ -161,29 +162,5 @@ class mailParser:
             val1, val2 = imapCon.uid('store', uid, arg1, arg2)
             imapCon.logout()
 
-    @staticmethod
-    def _getBody(payload, msg_encoding):
-        enc = payload['Content-Transfer-Encoding']
-        if enc != 'base64':
-            return payload.get_payload(decode=True).decode(encoding=msg_encoding)
-        else:
-            return base64.b64decode(payload.get_payload())
 
-    @staticmethod
-    def _doLinkMatch(compiledRegExPattern, link):
-        return any(rx.search(link) for p, rx in compiledRegExPattern)
 
-    @staticmethod
-    def _getCompiledRDRegExPattern(hosterDict):
-        regExPatterns = []
-        for key, value in hosterDict.items():
-            patterns = value.get("regex")
-            if not patterns:
-                continue
-
-            if isinstance(patterns, list):
-                regExPatterns.extend(patterns)
-            else:
-                regExPatterns.append(patterns)
-
-        return [(p, re.compile(p, re.IGNORECASE)) for p in regExPatterns if p]

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-import base64
+
 import binascii
 import imaplib
 import json
@@ -28,6 +28,8 @@ import requests
 from _socket import gaierror
 
 import xbmc
+from libs.common.tools import getCompiledRDRegExPattern, base64Decode, base64Encode, formatSize, get_query_args, \
+    doLinkMatch
 from libs.core.mailParser import mailParser
 from libs.core.pyloadAPI import pyloadAPI
 from libs.core.realDebritCore import realdebritCore
@@ -126,7 +128,7 @@ class mail2pyload:
         tag = kwargs.get('tag')
 
         if not tag is None:
-            tag = self._base64Decode(tag)
+            tag = base64Decode(tag)
             mail = json.loads(tag)
 
             poster = None
@@ -135,7 +137,7 @@ class mail2pyload:
 
             for i in mail['images']:
 
-                tag = self._base64Encode(i)
+                tag = base64Encode(i)
                 url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(self._buildArgs(method='show', param='IMAGE', tag=tag))
                 self._guiManager.addItem(title='[THUMB] ' + mail['subject'],url=url,poster=i)
 
@@ -146,7 +148,7 @@ class mail2pyload:
                 contextmenu = []
 
                 for h in p['hosters']:
-                    tag = self._base64Encode( h['link'])
+                    tag = base64Encode( h['link'])
 
                     pyload_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                         self._buildArgs(method='add', param='PYLOAD_PACKAGE', tag=tag))
@@ -207,7 +209,7 @@ class mail2pyload:
                         ]
 
                         plot = (f"[B]Link Count[/B]: {item['linksdone']} / {item['linkstotal']}\n"
-                                f"[B]Size[/B]: {self._formatSize(item['sizedone'])} / {self._formatSize(item['sizetotal'])}")
+                                f"[B]Size[/B]: {formatSize(item['sizedone'])} / {formatSize(item['sizetotal'])}")
 
 
 
@@ -285,7 +287,7 @@ class mail2pyload:
             mails = p.getNewMails()
 
             mails_tag = json.dumps(mails)
-            mails_tag = self._base64Encode(mails_tag)
+            mails_tag = base64Encode(mails_tag)
 
             for mail in mails:
                 poster = self._ICON
@@ -305,7 +307,7 @@ class mail2pyload:
                     infoLabels['Plot'] = f'[COLOR red][B]Package Count[/B]: {package_count}[/COLOR]\n' + mail['description']
 
                 tag = json.dumps(mail)
-                tag = self._base64Encode(tag)
+                tag = base64Encode(tag)
 
                 # seen_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                 #     self._buildArgs(method='markmail', param='SEEN', tag=mail['uid']))
@@ -340,18 +342,36 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
-    @staticmethod
-    def _get_highest_prio_match(prios, candidates):
-        for pattern in prios:
-            regex = re.compile(pattern)
-            for s in candidates:
-                if regex.search(s):
-                    return s
-        return candidates[0]
+    def _getPreferredHosterLink(self, candidates, rd_hosterDict, COMPILED_RD_REGEX_PATTERN):
+        if self._HOSTER_WHITELIST != '':
+            for candidate in candidates:
+                match = re.search(self._HOSTER_WHITELIST, candidate)
+                if match:
+                    return candidate
+
+        if len(rd_hosterDict) > 0:
+            for candidate in candidates:
+                if doLinkMatch(COMPILED_RD_REGEX_PATTERN, candidate):
+                    return candidate
+
+        return None
 
     def addMails(self, **kwargs):
         param = kwargs.get('param')
         tag = kwargs.get('tag')
+
+        rd_hosterDict = {}
+        if self._db:
+            rd_hosterlist = self._db.getrealdebritHosts()
+            if rd_hosterlist:
+                try:
+                    rd_hosterDict = json.loads(rd_hosterlist)
+                finally:
+                    pass
+
+        COMPILED_RD_REGEX_PATTERN = None
+        if len(rd_hosterDict) > 0:
+            COMPILED_RD_REGEX_PATTERN = getCompiledRDRegExPattern(rd_hosterDict)
 
         prios = [
             r'https?:\/\/(\w+\.)?(?:turbobit|turbobit5|turbobita|torbobit|trbt|turbo|turbobif|turb|tbit|trbbt|turbobeet|tourbobit|turbobitn)\.(?:net|cc|pw|com|to)\/(?:download\/free\/[^\s"\'><:|]+|[0-9a-z]{12})(?:\.html|\/[^\s"\'><:|]+)?',
@@ -361,8 +381,9 @@ class mail2pyload:
         ]
 
         if tag:
-            mails = self._base64Decode(tag)
+            mails = base64Decode(tag)
             mails = json.loads(mails)
+            errorOccurs = False
 
             for mail in mails:
                 if 'packages' in mail:
@@ -373,13 +394,23 @@ class mail2pyload:
                                 if 'link' in hoster:
                                     candidates.append(hoster['link'])
 
-                            self.addEntity(param='PYLOAD_PACKAGE', tag=self._get_highest_prio_match(prios, candidates))
+                            link = self._getPreferredHosterLink(candidates, rd_hosterDict, COMPILED_RD_REGEX_PATTERN)
+                            # self.addEntity(param='PYLOAD_PACKAGE', tag=self._get_highest_prio_match(prios, candidates))
+
+                            if link:
+                                self.addEntity(param='PYLOAD_PACKAGE', tag=link)
+                            else:
+                                errorOccurs = True
+                                self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                                      self._t.getString(PYLOAD_ERROR_UNKOWN),
+                                                                      icon=self._ERROR_ICON)
 
                         #if 'hosters' in package and len(package['hosters']) > 0:
                         #    if 'link' in package['hosters'][0]:
                         #        self.addEntity(param='PYLOAD_PACKAGE', tag=package['hosters'][0]['link'])
 
-            self.deleteMails(param=param, tag=tag)
+            if not errorOccurs:
+                self.deleteMails(param=param, tag=tag)
 
     def deleteMails(self, **kwargs):
         param = kwargs.get('param')
@@ -389,7 +420,7 @@ class mail2pyload:
                                             message=self._t.getString(PYLOAD_DELETE_ALL_MAILS_CONFIRMATION))
 
         if doit:
-            mails = self._base64Decode(tag)
+            mails = base64Decode(tag)
             mails = json.loads(mails)
 
             for mail in mails:
@@ -413,7 +444,7 @@ class mail2pyload:
         try:
             tag = kwargs.get('tag')
             if tag:
-                image = self._base64Decode(tag)
+                image = base64Decode(tag)
 
                 xbmc.executebuiltin('ShowPicture(%s)' % image)
 
@@ -427,7 +458,7 @@ class mail2pyload:
         try:
 
             p = mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER,
-                           self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST)
+                           self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST, None)
 
             p.setFlag(tag, param, True)
             if param != 'SEEN':
@@ -465,7 +496,7 @@ class mail2pyload:
 
     def addPyLoadPackage(self, tag):
         try:
-            tag = self._base64Decode(tag)
+            tag = base64Decode(tag)
         except UnicodeDecodeError as e:
             pass
 
@@ -598,7 +629,7 @@ class mail2pyload:
 
         else:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(PYLOAD_ERROR_UMNKOWN),icon=self._ERROR_ICON)
+                                                  self._t.getString(PYLOAD_ERROR_UNKOWN),icon=self._ERROR_ICON)
 
     @staticmethod
     def _buildArgs(**kwargs):
@@ -626,63 +657,8 @@ class mail2pyload:
 
         return args
 
-    @staticmethod
-    def _base64Encode(s):
-        b = s.encode("ascii")
-
-        encoded = base64.b64encode(b)
-        return encoded.decode("ascii")
-
-
-    @staticmethod
-    def _base64Decode(s):
-        b = s.encode("ascii")
-        decoded = base64.b64decode(b)
-        return decoded.decode("ascii")
-
-    @staticmethod
-    def _get_query_args(s_args):
-        args = urllib.parse.parse_qs(urllib.parse.urlparse(s_args).query)
-
-        for key in args:
-            args[key] = args[key][0]
-        return args
-
-    @staticmethod
-    def _formatSize(b):
-        i = 0
-        while b > 1024:
-            i += 1
-            b /= 1024
-
-        if i > 0:
-            b = '{:.2f}'.format(b)
-
-        if i == 0:
-            return f'{b} B'
-        elif i == 1:
-            return f'{b} KiB'
-        elif i == 2:
-            return f'{b} MiB'
-        elif i == 3:
-            return f'{b} GiB'
-        elif i == 4:
-            return f'{b} TiB'
-        elif i == 5:
-            return f'{b} PiB'
-        elif i == 6:
-            return f'{b} EiB'
-        elif i == 7:
-            return f'{b} ZiB'
-        elif i == 8:
-            return f'{b} YiB'
-
-        return None
-
-
-
     def run(self):
-        args = self._get_query_args(sys.argv[2])
+        args = get_query_args(sys.argv[2])
 
         if args is None or args.__len__() == 0:
             args = self._buildArgs(method='home')
