@@ -65,8 +65,16 @@ class mail2pyload:
         self._IMAP_USERNAME = addon.getSetting('imap_username')
         self._IMAP_PASSWORD = addon.getSetting('imap_password')
         self._IMAP_FOLDER = '\"' + addon.getSetting('imap_folder') + '\"'
-        self._HOSTER_WHITELIST = addon.getSetting('hoster_whitelist')
-        self._HOSTER_BLACKLIST = addon.getSetting('hoster_blacklist')
+
+        _HOSTER_WHITELIST = addon.getSetting('hoster_whitelist')
+        self._HOSTER_WHITELIST_COMPILED = None
+        if _HOSTER_WHITELIST and _HOSTER_WHITELIST != "":
+            self._HOSTER_WHITELIST_COMPILED = re.compile(_HOSTER_WHITELIST, re.IGNORECASE)
+
+        _HOSTER_BLACKLIST = addon.getSetting('hoster_blacklist')
+        self._HOSTER_BLACKLIST_COMPILED = None
+        if _HOSTER_BLACKLIST and _HOSTER_BLACKLIST != "":
+            self._HOSTER_BLACKLIST_COMPILED = re.compile(_HOSTER_BLACKLIST, re.IGNORECASE)
 
         self._PYLOAD_SERVER = addon.getSetting('pyload_server')
         self._PYLOAD_PORT = int(addon.getSetting('pyload_port'))
@@ -283,7 +291,7 @@ class mail2pyload:
                     finally:
                         pass
 
-            p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST, rd_hosterDict)
+            p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST_COMPILED, self._HOSTER_BLACKLIST_COMPILED, rd_hosterDict)
             mails = p.getNewMails()
 
             mails_tag = json.dumps(mails)
@@ -337,10 +345,9 @@ class mail2pyload:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
     def _getPreferredHosterLink(self, candidates, rd_hosterDict):
-        if self._HOSTER_WHITELIST != '':
+        if self._HOSTER_WHITELIST_COMPILED:
             for candidate in candidates:
-                match = re.search(self._HOSTER_WHITELIST, candidate)
-                if match:
+                if self._HOSTER_WHITELIST_COMPILED.search(candidate):
                     return candidate
 
         links = []
@@ -367,13 +374,16 @@ class mail2pyload:
         param = kwargs.get('param')
         tag = kwargs.get('tag')
 
+        xbmc.log("populate hosterDict.Begin")
         rd_hosterDict = {}
         if self._db:
             rd_hosterlist = self._db.getrealdebritHosts()
             if rd_hosterlist:
                 try:
                     rd_hosterDict = json.loads(rd_hosterlist)
+                    xbmc.log("compileRegExPattern.Begin")
                     rd_hosterDict = compileRegExPattern(rd_hosterDict)
+                    xbmc.log("compileRegExPattern.End")
                     rd_hosterDict = sorted(
                         rd_hosterDict.items(),
                         key=lambda item: (
@@ -384,6 +394,7 @@ class mail2pyload:
                     )
                 finally:
                     pass
+        xbmc.log("populate hosterDict.End")
 
         if tag:
             mails = base64Decode(tag)
@@ -399,7 +410,9 @@ class mail2pyload:
                                 if 'link' in hoster:
                                     candidates.append(hoster['link'])
 
+                            xbmc.log("_getPreferredHosterLink.Begin")
                             link = self._getPreferredHosterLink(candidates, rd_hosterDict)
+                            xbmc.log("_getPreferredHosterLink.End")
                             if link:
                                 self.addEntity(param='PYLOAD_PACKAGE', tag=link)
                             else:
@@ -457,7 +470,7 @@ class mail2pyload:
         try:
 
             p = mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER,
-                           self._HOSTER_WHITELIST, self._HOSTER_BLACKLIST, None)
+                           self._HOSTER_WHITELIST_COMPILED, self._HOSTER_BLACKLIST_COMPILED, None)
 
             p.setFlag(tag, param, True)
             if param != 'SEEN':
@@ -472,9 +485,8 @@ class mail2pyload:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
     def _getDownloadLink(self, link):
-        if self._HOSTER_WHITELIST != '':
-            match = re.search(self._HOSTER_WHITELIST, link)
-            if match:
+        if self._HOSTER_WHITELIST_COMPILED:
+            if self._HOSTER_WHITELIST_COMPILED.search(link):
                 return link
 
         if self._rdAPI:
@@ -502,7 +514,9 @@ class mail2pyload:
         except binascii.Error as e1:
             pass
 
+        xbmc.log(f"_getDownloadLink.Begin {tag}")
         link = self._getDownloadLink(tag)
+        xbmc.log("_getDownloadLink.End")
         if link is None:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
                                                   self._t.getString(PYLOAD_ERROR_CONVERTLINK), icon=self._ERROR_ICON)

@@ -26,14 +26,14 @@ from libs.common.tools import doLinkMatch, getBody, getCompiledRDRegExPattern
 
 class mailParser:
 
-    def __init__(self, server, port, username, password, folder, hoster_whitelist, hoster_blacklist, rd_hosterDict):
+    def __init__(self, server, port, username, password, folder, hoster_whitelist_compiled, hoster_blacklist_compiled, rd_hosterDict):
         self._IMAP_SERVER = server
         self._IMAP_PORT = port
         self._IMAP_USERNAME = username
         self._IMAP_PASSWORD = password
         self._IMAP_FOLDER = folder
-        self._HOSTER_WHITELIST = hoster_whitelist
-        self._HOSTER_BLACKLIST = hoster_blacklist
+        self._HOSTER_WHITELIST_COMPILED = hoster_whitelist_compiled
+        self._HOSTER_BLACKLIST_COMPILED = hoster_blacklist_compiled
         self._RD_HOSTERDICT = rd_hosterDict
         self._COMPILED_RD_REGEX_PATTERN = None
         if rd_hosterDict:
@@ -110,15 +110,15 @@ class mailParser:
                                 link = t.get('href')
                                 addit = False
 
-                                if self._HOSTER_WHITELIST != '':
-                                    match = re.match(self._HOSTER_WHITELIST, link)
+                                if self._HOSTER_WHITELIST_COMPILED:
+                                    match = self._HOSTER_WHITELIST_COMPILED.search(link)
                                     addit = (not match is None)
 
                                 if not addit and self._RD_HOSTERDICT and len(self._RD_HOSTERDICT) > 0:
                                     addit = doLinkMatch(self._COMPILED_RD_REGEX_PATTERN, link)
 
-                                if addit and self._HOSTER_BLACKLIST != '':
-                                    match = re.match(self._HOSTER_BLACKLIST, link)
+                                if addit and self._HOSTER_BLACKLIST_COMPILED:
+                                    match = self._HOSTER_BLACKLIST_COMPILED.match(link)
                                     addit = (match is None)
 
                                 if addit:
