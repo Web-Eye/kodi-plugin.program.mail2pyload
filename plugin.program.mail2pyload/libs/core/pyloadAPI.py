@@ -76,6 +76,14 @@ class pyloadAPI:
         payload = {k: json.dumps(v) for k, v in data.items()}
         return self._session.post(f'{self._baseURL}deletePackages', headers=self._headers, data=payload)
 
+    def deleteFile(self, fid):
+        data = {
+            'file_ids': [fid]
+        }
+
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}deleteFiles', headers=self._headers, data=payload)
+
     def getPackageInfo(self, pid):
         data = {
             'package_id': pid
@@ -89,3 +97,13 @@ class pyloadAPI:
         }
         payload = {k: json.dumps(v) for k, v in data.items()}
         return self._session.post(f'{self._baseURL}getPackageData', headers=self._headers, data=payload)
+
+    def restartFile(self, fid):
+        data = {
+            'file_id': fid
+        }
+        payload = {k: json.dumps(v) for k, v in data.items()}
+        return self._session.post(f'{self._baseURL}restartFile', headers=self._headers, data=payload)
+
+    def restartFailed(self):
+        return self._session.post(f'{self._baseURL}restartFile', headers=self._headers)

@@ -72,6 +72,14 @@ msgctxt "#30113"
 msgid "MARK_ALLMAIL_DELETED"
 msgstr "Lösche alle Mails"
 
+msgctxt "#30114"
+msgid "PYLOAD_RESTART_FILE"
+msgstr "Starte Datei Neu"
+
+msgctxt "#30115"
+msgid "PYLOAD_DELETE_FILE"
+msgstr "Lösche Datei"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"
@@ -131,6 +139,10 @@ msgstr "Sollen alle Nachrichten gelöscht werden?"
 msgctxt "#30214"
 msgid "PYLOAD_ERROR_CONVERTLINK"
 msgstr "Download Link konnte nicht erstellt werden"
+
+msgctxt "#30215"
+msgid "PYLOAD_RESTARTED_SUCCESFULLY"
+msgstr "Erfolgreich Neu gestartet"
 
 msgctxt "#30500"
 msgid "IMAP_SETTINGS"

@@ -44,6 +44,10 @@ PYLOAD_QUESTION = 'pyload_question'
 PYLOAD_DELETE_CONFIRMATION = 'pyload_delete_confirmation'
 PYLOAD_DELETE_ALL_MAILS_CONFIRMATION = 'pyload_delete_all_mails_confirmation'
 PYLOAD_ERROR_CONVERTLINK = 'pyload_error_convertlink'
+PYLOAD_RESTART_FILE = 'pyload_restart_file'
+PYLOAD_DELETE_FILE = 'pyload_delete_file'
+PYLOAD_RESTARTED_SUCCESFULLY = 'pyload_restarted_succesfully'
+
 
 class Translations:
 
@@ -74,10 +78,13 @@ class Translations:
             PYLOAD_MOVETO_QUEUE:                    self._language(30109),
             PYLOAD_MOVETO_COLLECTOR:                self._language(30110),
             PYLOAD_DELETE_PACKAGE:                  self._language(30111),
+            PYLOAD_RESTART_FILE:                    self._language(30114),
+            PYLOAD_DELETE_FILE:                     self._language(30115),
             PYLOAD_NOTIFICATION:                    self._language(30207),
             PYLOAD_ADDED_SUCCESFULLY:               self._language(30208),
             PYLOAD_MOVED_SUCCESFULLY:               self._language(30209),
             PYLOAD_DELETED_SUCCESFULLY:             self._language(30210),
+            PYLOAD_RESTARTED_SUCCESFULLY:           self._language(30215),
             PYLOAD_QUESTION:                        self._language(30211),
             PYLOAD_DELETE_CONFIRMATION:             self._language(30212),
             PYLOAD_DELETE_ALL_MAILS_CONFIRMATION:   self._language(30213),

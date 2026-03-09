@@ -267,7 +267,19 @@ class mail2pyload:
                                 'Plot': plot
                             }
 
+                            restart_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                                self._buildArgs(method='restart', param='PYLOAD_FILE', tag=fid))
+
+                            delete_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+                                self._buildArgs(method='delete', param='PYLOAD_FILE', tag=fid))
+
+                            contextmenu = [
+                                (self._t.getString(PYLOAD_RESTART_FILE), f'RunPlugin("{restart_url}")'),
+                                (self._t.getString(PYLOAD_DELETE_FILE), f'RunPlugin("{delete_url}")'),
+                            ]
+
                             self._guiManager.addDirectory(title=name, poster=self._ICON, _type='video', infoLabels=infoLabels,
+                                                          contextmenu=contextmenu,
                                                           args=self._buildArgs()
                                                           )
 
@@ -563,7 +575,17 @@ class mail2pyload:
         tag = kwargs.get('tag')
 
         {
-            'PYLOAD_PACKAGE': self.deletePyloadPackage
+            'PYLOAD_PACKAGE': self.deletePyloadPackage,
+            'PYLOAD_FILE': self.deletePyloadFile
+        }[param](tag=tag)
+
+    def restartEntity(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        {
+            'PYLOAD_PACKAGE': self.restartPyloadPackage,
+            'PYLOAD_FILE': self.restartPyloadFile
         }[param](tag=tag)
 
     def movePyloadPackage(self, **kwargs):
@@ -634,6 +656,38 @@ class mail2pyload:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
                                                   self._t.getString(SERVER_NOT_REACHABLE),icon=self._ERROR_ICON)
 
+    def deletePyloadFile(self, **kwargs):
+        fid = kwargs.get('tag')
+
+        try:
+            response = self._api.deleteFile(fid=fid)
+            if not response is None and response.status_code == 200:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                      self._t.getString(PYLOAD_DELETED_SUCCESFULLY),
+                                                      icon=self._OK_ICON)
+
+                xbmc.executebuiltin('Container.Refresh')
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE), icon=self._ERROR_ICON)
+
+
+    def restartPyloadFile(self, **kwargs):
+        fid = kwargs.get('tag')
+
+        try:
+            response = self._api.restartFile(fid=fid)
+            if not response is None and response.status_code == 200:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                      self._t.getString(PYLOAD_RESTARTED_SUCCESFULLY), icon=self._OK_ICON)
+
+                xbmc.executebuiltin('Container.Refresh')
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE),icon=self._ERROR_ICON)
+
 
     def handlePyLoadErrorResponse(self, response):
         if not response is None:
@@ -691,7 +745,8 @@ class mail2pyload:
             'addall':       self.addMails,
             'deleteall':    self.deleteMails,
             'move':         self.moveEntity,
-            'delete':       self.deleteEntity
+            'delete':       self.deleteEntity,
+            'restart':      self.restartEntity
         }[method](param=param, page=page, tag=tag, navigation=navigation)
 
         self._guiManager.endOfDirectory()
