@@ -80,6 +80,10 @@ msgctxt "#30115"
 msgid "PYLOAD_DELETE_FILE"
 msgstr "Lösche Datei"
 
+msgctxt "#30116"
+msgid "PYLOAD_RESTART_FAILED"
+msgstr "Starte Alle Fehlschäge Neu"
+
 msgctxt "#30200"
 msgid "ERROR"
 msgstr "Error"

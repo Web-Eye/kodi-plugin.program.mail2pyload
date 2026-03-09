@@ -168,7 +168,15 @@ class mail2pyload:
 
     def setPyLoadPackageView(self, **kwargs):
 
+        restart_failed_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
+            self._buildArgs(method='restart', param='PYLOAD_FAILED'))
+
+        contextmenu = [
+            (self._t.getString(PYLOAD_RESTART_FAILED), f'RunPlugin("{restart_failed_url}")'),
+        ]
+
         self._guiManager.addDirectory(title=self._t.getString(PYLOAD_QUEUE), poster=self._ICON,
+                                      contextmenu=contextmenu,
                                       args=self._buildArgs(method='list', param='PYLOAD_QUEUE'))
         self._guiManager.addDirectory(title=self._t.getString(PYLOAD_COLLECTOR), poster=self._ICON,
                                       args=self._buildArgs(method='list', param='PYLOAD_COLLECTOR'))
@@ -585,7 +593,8 @@ class mail2pyload:
 
         {
             'PYLOAD_PACKAGE': self.restartPyloadPackage,
-            'PYLOAD_FILE': self.restartPyloadFile
+            'PYLOAD_FILE': self.restartPyloadFile,
+            'PYLOAD_FAILED': self.restartPyloadFailed,
         }[param](tag=tag)
 
     def movePyloadPackage(self, **kwargs):
@@ -687,6 +696,24 @@ class mail2pyload:
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
                                                   self._t.getString(SERVER_NOT_REACHABLE),icon=self._ERROR_ICON)
+
+    def restartPyloadPackage(self, **kwargs):
+        pid = kwargs.get('tag')
+        raise NotImplementedError
+
+    def restartPyloadFailed(self, **kwargs):
+        try:
+            response = self._api.restartFailed()
+            if not response is None and response.status_code == 200:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                      self._t.getString(PYLOAD_RESTARTED_SUCCESFULLY),
+                                                      icon=self._OK_ICON)
+
+                xbmc.executebuiltin('Container.Refresh')
+
+        except requests.exceptions.ConnectionError as e:
+            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                  self._t.getString(SERVER_NOT_REACHABLE), icon=self._ERROR_ICON)
 
 
     def handlePyLoadErrorResponse(self, response):

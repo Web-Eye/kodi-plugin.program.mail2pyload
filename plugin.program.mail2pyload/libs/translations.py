@@ -47,6 +47,7 @@ PYLOAD_ERROR_CONVERTLINK = 'pyload_error_convertlink'
 PYLOAD_RESTART_FILE = 'pyload_restart_file'
 PYLOAD_DELETE_FILE = 'pyload_delete_file'
 PYLOAD_RESTARTED_SUCCESFULLY = 'pyload_restarted_succesfully'
+PYLOAD_RESTART_FAILED = 'pyload_restart_failed'
 
 
 class Translations:
@@ -79,6 +80,7 @@ class Translations:
             PYLOAD_MOVETO_COLLECTOR:                self._language(30110),
             PYLOAD_DELETE_PACKAGE:                  self._language(30111),
             PYLOAD_RESTART_FILE:                    self._language(30114),
+            PYLOAD_RESTART_FAILED:                  self._language(30116),
             PYLOAD_DELETE_FILE:                     self._language(30115),
             PYLOAD_NOTIFICATION:                    self._language(30207),
             PYLOAD_ADDED_SUCCESFULLY:               self._language(30208),
