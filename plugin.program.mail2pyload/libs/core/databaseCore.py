@@ -38,3 +38,16 @@ class databaseCore:
 
         finally:
             con.close()
+
+    @staticmethod
+    def getrealdebritDomains():
+        con = databaseHelper.get_connection()
+        try:
+            return DL_settings.getSetting(con, 'realdebrit_domains')
+
+        except mysql.connector.Error as e:
+            print(f"Error connecting to MariaDB Platform: {e}")
+            return False
+
+        finally:
+            con.close()

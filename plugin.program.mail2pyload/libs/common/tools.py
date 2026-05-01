@@ -117,3 +117,8 @@ def formatSize(b):
         return f'{b} YiB'
 
     return None
+
+def replace_prefix(s: str, old: str, new: str) -> str:
+    if s.startswith(old):
+        return new + s[len(old):]
+    return s

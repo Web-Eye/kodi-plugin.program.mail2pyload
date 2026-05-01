@@ -21,7 +21,7 @@ import re
 from email.header import make_header, decode_header
 from bs4 import BeautifulSoup
 
-from libs.common.tools import doLinkMatch, getBody, getCompiledRDRegExPattern
+from libs.common.tools import doLinkMatch, getBody, getCompiledRDRegExPattern, replace_prefix
 
 
 class mailParser:
@@ -108,6 +108,8 @@ class mailParser:
                             h = ''.join(['' if ord(i) < 20 else i for i in t.getText()])
                             if h != '' and t.get('href') != '':
                                 link = t.get('href')
+                                ## TODO change link to turbobit link
+                                link = replace_prefix(link, "https://trbbt.net", "https://turbobit.net")
                                 addit = False
 
                                 if self._HOSTER_WHITELIST_COMPILED:

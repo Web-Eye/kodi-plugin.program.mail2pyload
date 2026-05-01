@@ -29,7 +29,7 @@ from _socket import gaierror
 
 import xbmc
 from libs.common.tools import base64Decode, base64Encode, formatSize, get_query_args, \
-    doLinkMatch, compileRegExPattern
+    doLinkMatch, compileRegExPattern, replace_prefix
 from libs.core.mailParser import mailParser
 from libs.core.pyloadAPI import pyloadAPI
 from libs.core.realDebritCore import realdebritCore
@@ -75,6 +75,8 @@ class mail2pyload:
         self._HOSTER_BLACKLIST_COMPILED = None
         if _HOSTER_BLACKLIST and _HOSTER_BLACKLIST != "":
             self._HOSTER_BLACKLIST_COMPILED = re.compile(_HOSTER_BLACKLIST, re.IGNORECASE)
+
+        self._RD_DOMAINS_COMPILED = None
 
         self._PYLOAD_SERVER = addon.getSetting('pyload_server')
         self._PYLOAD_PORT = int(addon.getSetting('pyload_port'))
@@ -505,11 +507,21 @@ class mail2pyload:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
     def _getDownloadLink(self, link):
+
+        ## TODO: change linkt to turbobit link
+        if self._db and not self._RD_DOMAINS_COMPILED:
+            self._RD_DOMAINS_COMPILED = self._getRDDomains()
+
+
+
+        link = replace_prefix(link, "https://trbbt.net", "https://turbobit.net")
+
         if self._HOSTER_WHITELIST_COMPILED:
             if self._HOSTER_WHITELIST_COMPILED.search(link):
                 return link
 
         if self._rdAPI:
+
             rsp = self._rdAPI.unrestrictLink(link)
             if rsp:
                 return rsp['download']
@@ -534,9 +546,7 @@ class mail2pyload:
         except binascii.Error as e1:
             pass
 
-        xbmc.log(f"_getDownloadLink.Begin {tag}")
         link = self._getDownloadLink(tag)
-        xbmc.log("_getDownloadLink.End")
         if link is None:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
                                                   self._t.getString(PYLOAD_ERROR_CONVERTLINK), icon=self._ERROR_ICON)
