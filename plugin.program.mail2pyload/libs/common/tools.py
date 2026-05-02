@@ -19,6 +19,7 @@ import re
 import json
 import urllib
 import urllib.parse
+from typing import Optional
 
 from urllib.parse import urlparse, urlunparse
 
@@ -126,30 +127,33 @@ def formatSize(b):
 #         return new + s[len(old):]
 #     return s
 
-def get_rddomain(link: str, regex_dict: dict) -> str | None:
-    if link and regex_dict:
-        for key, patterns in regex_dict.items():
-            for pattern in patterns:
-                if pattern.search(link):
-                    return key
+def get_rddomain(url: str, regex_dict: dict) -> Optional[str]:
+    if not regex_dict:
+        return None
+
+    for key, patterns in regex_dict.items():
+        for pattern in patterns:
+            if pattern.search(url):
+                return key
 
     return None
 
 
-def replace_domain(url: str, new_domain: str | None) -> str | None:
-    if url and new_domain:
-        parsed = urlparse(url)
-        new_netloc = new_domain
-        new_url = parsed._replace(netloc=new_netloc)
-        return urlunparse(new_url)
+def replace_domain(url: str, new_domain: Optional[str]) -> str:
+    if not new_domain:
+        return url
 
-    return url
+    parsed = urlparse(url)
+    new_netloc = new_domain
+    new_url = parsed._replace(netloc=new_netloc)
+    return urlunparse(new_url)
 
-def loads_dict(value: str) -> dict | None:
+
+def loads_dict(value: str) -> Optional[dict]:
     if value:
         try:
             return json.loads(value)
-        finally:
-            pass
+        except json.JSONDecodeError:
+            return None
 
     return None
