@@ -21,12 +21,13 @@ import re
 from email.header import make_header, decode_header
 from bs4 import BeautifulSoup
 
-from libs.common.tools import doLinkMatch, getBody, getCompiledRDRegExPattern, replace_prefix
+from libs.common.tools import doLinkMatch, getBody, getCompiledRDRegExPattern, get_rddomain, replace_domain
 
 
 class mailParser:
 
-    def __init__(self, server, port, username, password, folder, hoster_whitelist_compiled, hoster_blacklist_compiled, rd_hosterDict):
+    def __init__(self, server, port, username, password, folder, hoster_whitelist_compiled, hoster_blacklist_compiled,
+                 rd_hosterDict, rd_domainDict_compiled):
         self._IMAP_SERVER = server
         self._IMAP_PORT = port
         self._IMAP_USERNAME = username
@@ -38,6 +39,8 @@ class mailParser:
         self._COMPILED_RD_REGEX_PATTERN = None
         if rd_hosterDict:
             self._COMPILED_RD_REGEX_PATTERN = getCompiledRDRegExPattern(self._RD_HOSTERDICT)
+
+        self._RD_DOMAINS_COMPILED = rd_domainDict_compiled
 
 
     def getNewMails(self):
@@ -108,8 +111,9 @@ class mailParser:
                             h = ''.join(['' if ord(i) < 20 else i for i in t.getText()])
                             if h != '' and t.get('href') != '':
                                 link = t.get('href')
-                                ## TODO change link to turbobit link
-                                link = replace_prefix(link, "https://trbbt.net", "https://turbobit.net")
+                                _domain = get_rddomain(link, self._RD_DOMAINS_COMPILED)
+                                link = replace_domain(link, _domain)
+
                                 addit = False
 
                                 if self._HOSTER_WHITELIST_COMPILED:

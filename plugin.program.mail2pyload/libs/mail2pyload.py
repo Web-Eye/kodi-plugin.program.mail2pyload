@@ -29,7 +29,7 @@ from _socket import gaierror
 
 import xbmc
 from libs.common.tools import base64Decode, base64Encode, formatSize, get_query_args, \
-    doLinkMatch, compileRegExPattern, replace_prefix
+    doLinkMatch, compileRegExPattern, get_rddomain, replace_domain, loads_dict
 from libs.core.mailParser import mailParser
 from libs.core.pyloadAPI import pyloadAPI
 from libs.core.realDebritCore import realdebritCore
@@ -200,14 +200,35 @@ class mail2pyload:
                     data = json.loads(response.text)
                     for item in data:
                         name = item['name']
-                        if item['sizedone'] > 0 and item['sizetotal'] > 0:
-                            pct = int(item['sizedone'] / item['sizetotal'] * 100)
+                        pct = 0
+
+                        done_filesize = item['sizedone']
+                        total_filesize = item['sizetotal']
+                        if total_filesize > 0:
+                            if done_filesize == total_filesize and item['linksdone'] == item['linkstotal']:
+                                pct = 100
+                            else:
+                                if item['linksdone'] == 0:
+                                    if done_filesize > 0 and total_filesize > 0:
+                                        pct = int(done_filesize / total_filesize * 100)
+
+                                else:
+                                    avg_filesize = done_filesize /  item['linksdone']
+                                    tmp_total_filesize = avg_filesize * item['linkstotal']
+                                    if tmp_total_filesize > total_filesize:
+                                        total_filesize = tmp_total_filesize
+                                    if total_filesize > 0:
+                                        pct = int(done_filesize / total_filesize * 100)
+
+                        if pct > 0:
                             padding = ''
                             if pct < 10:
                                 padding = '  '
                             elif pct < 100:
                                 padding = ' '
+
                             name = f'{padding}[{pct}%] {name}'
+
 
                         arg = 'PYLOAD_QUEUE'
                         contextTitle = PYLOAD_MOVETO_QUEUE
@@ -227,7 +248,7 @@ class mail2pyload:
                         ]
 
                         plot = (f"[B]Link Count[/B]: {item['linksdone']} / {item['linkstotal']}\n"
-                                f"[B]Size[/B]: {formatSize(item['sizedone'])} / {formatSize(item['sizetotal'])}")
+                                f"[B]Size[/B]: {formatSize(done_filesize)} / {formatSize(total_filesize)}")
 
 
 
@@ -307,13 +328,13 @@ class mail2pyload:
             rd_hosterDict = {}
             if self._db:
                 rd_hosterlist = self._db.getrealdebritHosts()
-                if rd_hosterlist:
-                    try:
-                        rd_hosterDict = json.loads(rd_hosterlist)
-                    finally:
-                        pass
+                rd_hosterDict = loads_dict(rd_hosterlist)
+                self._getRDDomains()
 
-            p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER, self._HOSTER_WHITELIST_COMPILED, self._HOSTER_BLACKLIST_COMPILED, rd_hosterDict)
+            p =  mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD,
+                            self._IMAP_FOLDER, self._HOSTER_WHITELIST_COMPILED, self._HOSTER_BLACKLIST_COMPILED,
+                            rd_hosterDict, self._RD_DOMAINS_COMPILED)
+
             mails = p.getNewMails()
 
             mails_tag = json.dumps(mails)
@@ -507,14 +528,9 @@ class mail2pyload:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
     def _getDownloadLink(self, link):
-
-        ## TODO: change linkt to turbobit link
-        if self._db and not self._RD_DOMAINS_COMPILED:
-            self._RD_DOMAINS_COMPILED = self._getRDDomains()
-
-
-
-        link = replace_prefix(link, "https://trbbt.net", "https://turbobit.net")
+        self._getRDDomains()
+        _domain = get_rddomain(link, self._RD_DOMAINS_COMPILED)
+        link = replace_domain(link, _domain)
 
         if self._HOSTER_WHITELIST_COMPILED:
             if self._HOSTER_WHITELIST_COMPILED.search(link):
@@ -528,6 +544,16 @@ class mail2pyload:
 
 
         return None
+
+    def _getRDDomains(self):
+        if self._db and not self._RD_DOMAINS_COMPILED:
+            domains = self._db.getrealdebritDomains()
+            domainsDict = loads_dict(domains)
+            if domainsDict:
+                self._RD_DOMAINS_COMPILED = {
+                    key: [re.compile(p, re.IGNORECASE) for p in patterns]
+                    for key, patterns in domainsDict.items()
+                }
 
     def addEntity(self, **kwargs):
         param = kwargs.get('param')

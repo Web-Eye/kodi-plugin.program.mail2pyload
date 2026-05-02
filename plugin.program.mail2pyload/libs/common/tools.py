@@ -16,8 +16,11 @@
 #
 import base64
 import re
+import json
 import urllib
 import urllib.parse
+
+from urllib.parse import urlparse, urlunparse
 
 
 def getBody(payload, msg_encoding):
@@ -118,7 +121,35 @@ def formatSize(b):
 
     return None
 
-def replace_prefix(s: str, old: str, new: str) -> str:
-    if s.startswith(old):
-        return new + s[len(old):]
-    return s
+# def replace_prefix(s: str, old: str, new: str) -> str:
+#     if s.startswith(old):
+#         return new + s[len(old):]
+#     return s
+
+def get_rddomain(link: str, regex_dict: dict) -> str | None:
+    if link and regex_dict:
+        for key, patterns in regex_dict.items():
+            for pattern in patterns:
+                if pattern.search(link):
+                    return key
+
+    return None
+
+
+def replace_domain(url: str, new_domain: str | None) -> str | None:
+    if url and new_domain:
+        parsed = urlparse(url)
+        new_netloc = new_domain
+        new_url = parsed._replace(netloc=new_netloc)
+        return urlunparse(new_url)
+
+    return url
+
+def loads_dict(value: str) -> dict | None:
+    if value:
+        try:
+            return json.loads(value)
+        finally:
+            pass
+
+    return None
