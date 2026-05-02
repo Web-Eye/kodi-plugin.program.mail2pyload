@@ -513,7 +513,7 @@ class mail2pyload:
         try:
 
             p = mailParser(self._IMAP_SERVER, self._IMAP_PORT, self._IMAP_USERNAME, self._IMAP_PASSWORD, self._IMAP_FOLDER,
-                           self._HOSTER_WHITELIST_COMPILED, self._HOSTER_BLACKLIST_COMPILED, None)
+                           self._HOSTER_WHITELIST_COMPILED, self._HOSTER_BLACKLIST_COMPILED, None, None)
 
             p.setFlag(tag, param, True)
             if param != 'SEEN':
