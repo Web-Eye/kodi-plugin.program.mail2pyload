@@ -341,6 +341,7 @@ class mail2pyload:
             mails_tag = base64Encode(mails_tag)
 
             for mail in mails:
+                mail['deleteable'] = True
                 poster = self._ICON
                 if len(mail['images']) > 0:
                     poster=mail['images'][0]
@@ -387,11 +388,16 @@ class mail2pyload:
         except imaplib.IMAP4.error as e:
             self._guiManager.setToastNotification(self._t.getString(IMAP_ERROR), e.args[0],icon=self._ERROR_ICON)
 
-    def _getPreferredHosterLink(self, candidates, rd_hosterDict):
+    def _getPreferredHosterLink(self, candidates, count, rd_hosterDict):
+        foundCount = 0
         if self._HOSTER_WHITELIST_COMPILED:
             for candidate in candidates:
                 if self._HOSTER_WHITELIST_COMPILED.search(candidate):
-                    return candidate
+                    foundCount += 1
+                    if foundCount > count:
+                        return candidate
+
+        foundCount = 0
 
         links = []
         if len(rd_hosterDict) > 0:
@@ -402,14 +408,24 @@ class mail2pyload:
                         if doLinkMatch(patterns, candidate):
                             traffic = hoster[1].get('traffic')
                             if not traffic:
-                                return candidate
+                                foundCount += 1
+                                if foundCount > count:
+                                    return candidate
                             else:
                                 links.append({ "candidate": candidate, "trafficLeft": traffic.get('left') })
 
         if len(links) > 0:
-            best = max(links, key=lambda item: item["trafficLeft"])
-            if best:
-                return best["candidate"]
+            top = sorted(
+                links,
+                key=lambda item: item["trafficLeft"],
+                reverse=True
+            )
+            if count < len(top):
+                return top[count]["candidate"]
+
+            # best = max(links, key=lambda item: item["trafficLeft"])
+            # if best:
+            #     return best["candidate"]
 
         return None
 
@@ -453,19 +469,36 @@ class mail2pyload:
                                 if 'link' in hoster:
                                     candidates.append(hoster['link'])
 
-                            xbmc.log("_getPreferredHosterLink.Begin")
-                            link = self._getPreferredHosterLink(candidates, rd_hosterDict)
-                            xbmc.log("_getPreferredHosterLink.End")
-                            if link:
-                                self.addEntity(param='PYLOAD_PACKAGE', tag=link)
-                            else:
+                            validLink = False
+                            for i in range(len(candidates)):
+
+                                xbmc.log("_getPreferredHosterLink.Begin")
+                                link = self._getPreferredHosterLink(candidates, i, rd_hosterDict)
+                                xbmc.log("_getPreferredHosterLink.End")
+                                if link:
+                                    validLink = self.addMultiplyEntity(param='PYLOAD_PACKAGE', tag=link)
+                                    if validLink:
+                                        break
+                                # else:
+                                #     errorOccurs = True
+                                    # self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                    #                                       self._t.getString(PYLOAD_ERROR_UNKOWN),
+                                    #                                       icon=self._ERROR_ICON)
+
+                            mail['deleteable'] = validLink
+
+                            if not validLink:
                                 errorOccurs = True
                                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                                      self._t.getString(PYLOAD_ERROR_UNKOWN),
+                                                                      self._t.getString(PYLOAD_ERROR_CONVERTLINK),
                                                                       icon=self._ERROR_ICON)
 
-            if not errorOccurs:
-                self.deleteMails(param=param, tag=tag)
+            mails_tag = json.dumps(mails)
+            mails_tag = base64Encode(mails_tag)
+            self.deleteMails(param=param, tag=mails_tag)
+
+            # if not errorOccurs:
+            #     self.deleteMails(param=param, tag=tag)
 
     def deleteMails(self, **kwargs):
         param = kwargs.get('param')
@@ -479,10 +512,10 @@ class mail2pyload:
             mails = json.loads(mails)
 
             for mail in mails:
-                uid = mail.get('uid')
-                if uid:
-                    self.markMail(param = 'DELETED', tag = str(uid))
-
+                if mail.get('deleteable'):
+                    uid = mail.get('uid')
+                    if uid:
+                        self.markMail(param = 'DELETED', tag = str(uid))
 
 
     def showEntity(self, **kwargs):
@@ -551,7 +584,7 @@ class mail2pyload:
             domainsDict = loads_dict(domains)
             if domainsDict:
                 self._RD_DOMAINS_COMPILED = {
-                    key: [re.compile(p, re.IGNORECASE) for p in patterns]
+                    key: [re.compile(p, re.IGNORECASE) for p in (patterns or [])]
                     for key, patterns in domainsDict.items()
                 }
 
@@ -563,7 +596,18 @@ class mail2pyload:
             'PYLOAD_PACKAGE': self.addPyLoadPackage
         }[param](tag=tag)
 
-    def addPyLoadPackage(self, tag):
+
+    def addMultiplyEntity(self, **kwargs):
+        param = kwargs.get('param')
+        tag = kwargs.get('tag')
+
+        return (
+            {
+                'PYLOAD_PACKAGE': self.addPyLoadPackage
+            }[param](tag=tag, supressErrorMessages=True)
+        )
+
+    def addPyLoadPackage(self, tag, supressErrorMessages = False):
         try:
             tag = base64Decode(tag)
         except UnicodeDecodeError as e:
@@ -574,9 +618,10 @@ class mail2pyload:
 
         link = self._getDownloadLink(tag)
         if link is None:
-            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                                  self._t.getString(PYLOAD_ERROR_CONVERTLINK), icon=self._ERROR_ICON)
-            return
+            if not supressErrorMessages:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
+                                                      self._t.getString(PYLOAD_ERROR_CONVERTLINK), icon=self._ERROR_ICON)
+            return False
 
         try:
             response = self._api.getCollector()
@@ -590,7 +635,9 @@ class mail2pyload:
                         pid = result['pid']
 
             else:
-                self.handlePyLoadErrorResponse(response)
+                if not supressErrorMessages:
+                    self.handlePyLoadErrorResponse(response)
+                return False
 
             if pid == 0:
                 response = self._api.addPackage(self._PYLOAD_DEFAULT_PACKAGE_NAME, link)
@@ -599,11 +646,16 @@ class mail2pyload:
 
             if not response is None and response.status_code == 200:
                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION), self._t.getString(PYLOAD_ADDED_SUCCESFULLY),icon=self._OK_ICON)
+                return True
             else:
-                self.handlePyLoadErrorResponse(response)
+                if not supressErrorMessages:
+                    self.handlePyLoadErrorResponse(response)
+                return False
 
         except requests.exceptions.ConnectionError as e:
-            self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR), self._t.getString(SERVER_NOT_REACHABLE),icon=self._ERROR_ICON)
+            if not supressErrorMessages:
+                self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR), self._t.getString(SERVER_NOT_REACHABLE),icon=self._ERROR_ICON)
+            return False
 
     def moveEntity(self, **kwargs):
         param = kwargs.get('param')
