@@ -423,10 +423,6 @@ class mail2pyload:
             if count < len(top):
                 return top[count]["candidate"]
 
-            # best = max(links, key=lambda item: item["trafficLeft"])
-            # if best:
-            #     return best["candidate"]
-
         return None
 
     def addMails(self, **kwargs):
@@ -458,7 +454,6 @@ class mail2pyload:
         if tag:
             mails = base64Decode(tag)
             mails = json.loads(mails)
-            errorOccurs = False
 
             for mail in mails:
                 if 'packages' in mail:
@@ -479,16 +474,10 @@ class mail2pyload:
                                     validLink = self.addMultiplyEntity(param='PYLOAD_PACKAGE', tag=link)
                                     if validLink:
                                         break
-                                # else:
-                                #     errorOccurs = True
-                                    # self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
-                                    #                                       self._t.getString(PYLOAD_ERROR_UNKOWN),
-                                    #                                       icon=self._ERROR_ICON)
 
                             mail['deleteable'] = validLink
 
                             if not validLink:
-                                errorOccurs = True
                                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
                                                                       self._t.getString(PYLOAD_ERROR_CONVERTLINK),
                                                                       icon=self._ERROR_ICON)
@@ -496,9 +485,6 @@ class mail2pyload:
             mails_tag = json.dumps(mails)
             mails_tag = base64Encode(mails_tag)
             self.deleteMails(param=param, tag=mails_tag)
-
-            # if not errorOccurs:
-            #     self.deleteMails(param=param, tag=tag)
 
     def deleteMails(self, **kwargs):
         param = kwargs.get('param')
