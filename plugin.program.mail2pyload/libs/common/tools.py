@@ -122,10 +122,6 @@ def formatSize(b):
 
     return None
 
-# def replace_prefix(s: str, old: str, new: str) -> str:
-#     if s.startswith(old):
-#         return new + s[len(old):]
-#     return s
 
 def get_rddomain(url: str, regex_dict: dict) -> Optional[str]:
     if not regex_dict:
