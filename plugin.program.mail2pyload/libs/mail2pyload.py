@@ -341,7 +341,7 @@ class mail2pyload:
             mails_tag = base64Encode(mails_tag)
 
             for mail in mails:
-                mail['deleteable'] = True
+                mail['deletable'] = True
                 poster = self._ICON
                 if len(mail['images']) > 0:
                     poster=mail['images'][0]
@@ -475,7 +475,7 @@ class mail2pyload:
                                     if validLink:
                                         break
 
-                            mail['deleteable'] = validLink
+                            mail['deletable'] = validLink
 
                             if not validLink:
                                 self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
@@ -498,7 +498,7 @@ class mail2pyload:
             mails = json.loads(mails)
 
             for mail in mails:
-                if mail.get('deleteable'):
+                if mail.get('deletable'):
                     uid = mail.get('uid')
                     if uid:
                         self.markMail(param = 'DELETED', tag = str(uid))
