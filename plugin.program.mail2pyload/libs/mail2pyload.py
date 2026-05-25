@@ -57,8 +57,24 @@ class mail2pyload:
         self._DEFAULT_IMAGE_URL = ''
         self._t = Translations(addon)
 
-        self._ERROR_ICON = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-error.jpg'
-        self._OK_ICON = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-ok.jpg'
+        self._ERROR_ICON                = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-error.jpg'
+        self._OK_ICON                   = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-ok.jpg'
+
+        self._ICON_STATUS_ABORTED       = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-aborted.png'
+        self._ICON_STATUS_CUSTOM        = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-custom.jpg'
+        self._ICON_STATUS_DECRYPTING    = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-decrypting.png'
+        self._ICON_STATUS_DOWNLOADING   = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-downloading.png'
+        self._ICON_STATUS_FAILED        = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-failed.png'
+        self._ICON_STATUS_FINISHED      = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-finished.jpg'
+        self._ICON_STATUS_OFFLINE       = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-offline.png'
+        self._ICON_STATUS_ONLINE        = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-online.webp'
+        self._ICON_STATUS_PROCESSING    = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-processing.png'
+        self._ICON_STATUS_QUEUED        = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-queued.webp'
+        self._ICON_STATUS_SKIPPED       = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-skipped.png'
+        self._ICON_STATUS_STARTING      = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-starting.png'
+        self._ICON_STATUS_TEMP_OFF      = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-temp_off.jpg'
+        self._ICON_STATUS_UNKNOWN       = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-unknown.png'
+        self._ICON_STATUS_WAITING       = f'special://home/addons/{self._ADDON_ID}/resources/assets/icon-status-waiting.png'
 
         self._IMAP_SERVER = addon.getSetting('imap_server')
         self._IMAP_PORT = int(addon.getSetting('imap_port'))
@@ -118,7 +134,7 @@ class mail2pyload:
 
 
     def setListView(self, **kwargs):
-        param = kwargs.get('param')
+        param = str(kwargs.get('param'))
         page = kwargs.get('page')
         tag = kwargs.get('tag')
         if page is None:
@@ -220,14 +236,22 @@ class mail2pyload:
                                     if total_filesize > 0:
                                         pct = int(done_filesize / total_filesize * 100)
 
-                        if pct > 0:
-                            padding = ''
-                            if pct < 10:
-                                padding = '  '
-                            elif pct < 100:
-                                padding = ' '
+                        # if pct > 0:
+                        #     padding = ''
+                        #     if pct < 10:
+                        #         padding = '  '
+                        #     elif pct < 100:
+                        #         padding = ' '
+                        #
+                        #     name = f'{padding}[{pct}%] {name}'
 
-                            name = f'{padding}[{pct}%] {name}'
+                        padding = ''
+                        if pct < 10:
+                            padding = '  '
+                        elif pct < 100:
+                            padding = ' '
+
+                        progress = f'{padding}{pct}%'
 
 
                         arg = 'PYLOAD_QUEUE'
@@ -239,25 +263,37 @@ class mail2pyload:
                         move_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
                             self._buildArgs(method='move', param=arg, tag=item['pid']))
 
+                        deleteTag = {
+                            'pid': item['pid'],
+                            'deletable': pct == 100
+                        }
+                        _deleteTag = json.dumps(deleteTag)
+                        _deleteTag = base64Encode(_deleteTag)
+
                         delete_url = 'plugin://' + self._ADDON_ID + '/?' + urllib.parse.urlencode(
-                            self._buildArgs(method='delete', param='PYLOAD_PACKAGE', tag=item['pid']))
+                            self._buildArgs(method='delete', param='PYLOAD_PACKAGE', tag=_deleteTag))
 
                         contextmenu = [
                             (self._t.getString(contextTitle), f'RunPlugin("{move_url}")'),
                             (self._t.getString(PYLOAD_DELETE_PACKAGE), f'RunPlugin("{delete_url}")'),
                         ]
 
-                        plot = (f"[B]Link Count[/B]: {item['linksdone']} / {item['linkstotal']}\n"
+                        plot = (f"[B]Progress[/B]: {progress}\n"
+                                f"[B]Link Count[/B]: {item['linksdone']} / {item['linkstotal']}\n"
                                 f"[B]Size[/B]: {formatSize(done_filesize)} / {formatSize(total_filesize)}")
 
-
+                        icon = self._ICON_STATUS_DOWNLOADING
+                        if pct == 0:
+                            icon = self._ICON_STATUS_QUEUED
+                        elif pct == 100:
+                            icon = self._ICON_STATUS_FINISHED
 
                         infoLabels = {
                             'Title': name,
                             'Plot': plot
                         }
 
-                        self._guiManager.addDirectory(title=name, poster=self._ICON, _type='video', infoLabels=infoLabels,
+                        self._guiManager.addDirectory(title=name, poster=icon, _type='video', infoLabels=infoLabels,
                                                       contextmenu=contextmenu,
                                                       args=self._buildArgs(method='list', param='PYLOAD_PACKAGE_DETAIL',
                                                                            tag=item['pid']))
@@ -309,7 +345,25 @@ class mail2pyload:
                                 (self._t.getString(PYLOAD_DELETE_FILE), f'RunPlugin("{delete_url}")'),
                             ]
 
-                            self._guiManager.addDirectory(title=name, poster=self._ICON, _type='video', infoLabels=infoLabels,
+                            icon = {
+                                'finished': self._ICON_STATUS_FINISHED,
+                                'offline': self._ICON_STATUS_OFFLINE,
+                                'online': self._ICON_STATUS_ONLINE,
+                                'queued': self._ICON_STATUS_QUEUED,
+                                'skipped': self._ICON_STATUS_SKIPPED,
+                                'waiting': self._ICON_STATUS_WAITING,
+                                'temp. offline': self._ICON_STATUS_TEMP_OFF,
+                                'starting': self._ICON_STATUS_STARTING,
+                                'failed': self._ICON_STATUS_FAILED,
+                                'aborted': self._ICON_STATUS_ABORTED,
+                                'decrypting': self._ICON_STATUS_DECRYPTING,
+                                'custom': self._ICON_STATUS_CUSTOM,
+                                'downloading': self._ICON_STATUS_DOWNLOADING,
+                                'processing': self._ICON_STATUS_PROCESSING,
+                                'unknown': self._ICON_STATUS_UNKNOWN,
+                            }[status]
+
+                            self._guiManager.addDirectory(title=name, poster=icon, _type='video', infoLabels=infoLabels,
                                                           contextmenu=contextmenu,
                                                           args=self._buildArgs()
                                                           )
@@ -700,40 +754,57 @@ class mail2pyload:
 
 
     def deletePyloadPackage(self, **kwargs):
-        pid = kwargs.get('tag')
+        deleteTag = base64Decode(kwargs.get('tag'))
+        deleteTag = json.loads(deleteTag)
+
+
+        pid = deleteTag.get('pid')
+        deletable = deleteTag.get('deletable')
 
         try:
-            response = self._api.getPackageInfo(pid=pid)
-            if not response is None and response.status_code == 200:
+            # response = self._api.getPackageInfo(pid=pid)
+            # if not response is None and response.status_code == 200:
+            #
+            #     doit = True
+            #     data = json.loads(response.text)
+            #
+            #     sizetotal = 0
+            #     sizedone = 0
+            #     if not data['sizetotal'] is None:
+            #         sizetotal = data['sizetotal']
+            #
+            #     if not data['sizedone'] is None:
+            #         sizedone = data['sizedone']
+            #
+            #     if sizetotal == 0 or (sizetotal > 0 and sizedone < sizetotal):
+            #         doit = self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION))
+            #
+            #     if doit:
+            #         response = self._api.deletePackage(pid=pid)
+            #
+            #         if not response is None and response.status_code == 200:
+            #             self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+            #                                                   self._t.getString(PYLOAD_DELETED_SUCCESFULLY), icon=self._OK_ICON)
+            #
+            #             xbmc.executebuiltin('Container.Refresh')
+            #
+            #         else:
+            #             self.handlePyLoadErrorResponse(response)
+            #
+            # else:
+            #     self.handlePyLoadErrorResponse(response)
 
-                doit = True
-                data = json.loads(response.text)
+            if deletable or self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION)):
+                response = self._api.deletePackage(pid=pid)
 
-                sizetotal = 0
-                sizedone = 0
-                if not data['sizetotal'] is None:
-                    sizetotal = data['sizetotal']
+                if not response is None and response.status_code == 200:
+                    self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
+                                                          self._t.getString(PYLOAD_DELETED_SUCCESFULLY), icon=self._OK_ICON)
 
-                if not data['sizedone'] is None:
-                    sizedone = data['sizedone']
+                    xbmc.executebuiltin('Container.Refresh')
 
-                if sizetotal == 0 or (sizetotal > 0 and sizedone < sizetotal):
-                    doit = self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION))
-
-                if doit:
-                    response = self._api.deletePackage(pid=pid)
-
-                    if not response is None and response.status_code == 200:
-                        self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
-                                                              self._t.getString(PYLOAD_DELETED_SUCCESFULLY), icon=self._OK_ICON)
-
-                        xbmc.executebuiltin('Container.Refresh')
-
-                    else:
-                        self.handlePyLoadErrorResponse(response)
-
-            else:
-                self.handlePyLoadErrorResponse(response)
+                else:
+                    self.handlePyLoadErrorResponse(response)
 
         except requests.exceptions.ConnectionError as e:
             self._guiManager.setToastNotification(self._t.getString(PYLOAD_ERROR),
