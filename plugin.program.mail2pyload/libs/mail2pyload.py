@@ -207,9 +207,9 @@ class mail2pyload:
 
             response = None
             if param == 'PYLOAD_QUEUE':
-                response = self._api.getQueue()
+                response = self._api.getQueueData()
             elif param == 'PYLOAD_COLLECTOR':
-                response = self._api.getCollector()
+                response = self._api.getCollectorData()
 
             if not response is None and response.status_code == 200:
                 if response.text:
@@ -220,17 +220,19 @@ class mail2pyload:
 
                         done_filesize = item['sizedone']
                         total_filesize = item['sizetotal']
+                        done_links = item['linksdone']
+                        total_links = len(item.get('links'))
                         if total_filesize > 0:
-                            if done_filesize == total_filesize and item['linksdone'] == item['linkstotal']:
+                            if done_filesize == total_filesize and done_links == total_links:
                                 pct = 100
                             else:
-                                if item['linksdone'] == 0:
+                                if done_links == 0:
                                     if done_filesize > 0 and total_filesize > 0:
                                         pct = int(done_filesize / total_filesize * 100)
 
                                 else:
-                                    avg_filesize = done_filesize /  item['linksdone']
-                                    tmp_total_filesize = avg_filesize * item['linkstotal']
+                                    avg_filesize = done_filesize /  done_links
+                                    tmp_total_filesize = avg_filesize * total_links
                                     if tmp_total_filesize > total_filesize:
                                         total_filesize = tmp_total_filesize
                                     if total_filesize > 0:
@@ -269,15 +271,23 @@ class mail2pyload:
                             (self._t.getString(PYLOAD_DELETE_PACKAGE), f'RunPlugin("{delete_url}")'),
                         ]
 
-                        plot = (f"[B]Progress[/B]: {progress}\n"
-                                f"[B]Link Count[/B]: {item['linksdone']} / {item['linkstotal']}\n"
-                                f"[B]Size[/B]: {formatSize(done_filesize)} / {formatSize(total_filesize)}")
-
                         icon = self._ICON_STATUS_DOWNLOADING
+                        status = 'downloading'
                         if pct == 0:
                             icon = self._ICON_STATUS_QUEUED
+                            status = 'queued'
                         elif pct == 100:
                             icon = self._ICON_STATUS_FINISHED
+                            status = 'finished'
+
+                        if any(link.get('status') == 8 for link in item.get('links', [])):
+                            icon = self._ICON_STATUS_FAILED
+                            status = 'failed'
+
+                        plot = (f"[B]Progress[/B]: {progress}\n"
+                                f"[B]Status[/B]: {status}\n"
+                                f"[B]Link Count[/B]: {done_links} / {total_links}\n"
+                                f"[B]Size[/B]: {formatSize(done_filesize)} / {formatSize(total_filesize)}")
 
                         infoLabels = {
                             'Title': name,

@@ -37,8 +37,14 @@ class pyloadAPI:
     def getQueue(self):
         return self._session.post(f'{self._baseURL}getQueue', headers=self._headers)
 
+    def getQueueData(self):
+        return self._session.post(f'{self._baseURL}getQueueData', headers=self._headers)
+
     def getCollector(self):
         return self._session.post(f'{self._baseURL}getCollector', headers=self._headers)
+
+    def getCollectorData(self):
+        return self._session.post(f'{self._baseURL}getCollectorData', headers=self._headers)
 
     def addPackage(self, name, link):
         data = {
