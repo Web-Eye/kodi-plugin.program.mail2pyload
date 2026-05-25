@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2024 WebEye
+# Copyright 2026 WebEye
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -235,15 +235,6 @@ class mail2pyload:
                                         total_filesize = tmp_total_filesize
                                     if total_filesize > 0:
                                         pct = int(done_filesize / total_filesize * 100)
-
-                        # if pct > 0:
-                        #     padding = ''
-                        #     if pct < 10:
-                        #         padding = '  '
-                        #     elif pct < 100:
-                        #         padding = ' '
-                        #
-                        #     name = f'{padding}[{pct}%] {name}'
 
                         padding = ''
                         if pct < 10:
@@ -762,38 +753,6 @@ class mail2pyload:
         deletable = deleteTag.get('deletable')
 
         try:
-            # response = self._api.getPackageInfo(pid=pid)
-            # if not response is None and response.status_code == 200:
-            #
-            #     doit = True
-            #     data = json.loads(response.text)
-            #
-            #     sizetotal = 0
-            #     sizedone = 0
-            #     if not data['sizetotal'] is None:
-            #         sizetotal = data['sizetotal']
-            #
-            #     if not data['sizedone'] is None:
-            #         sizedone = data['sizedone']
-            #
-            #     if sizetotal == 0 or (sizetotal > 0 and sizedone < sizetotal):
-            #         doit = self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION))
-            #
-            #     if doit:
-            #         response = self._api.deletePackage(pid=pid)
-            #
-            #         if not response is None and response.status_code == 200:
-            #             self._guiManager.setToastNotification(self._t.getString(PYLOAD_NOTIFICATION),
-            #                                                   self._t.getString(PYLOAD_DELETED_SUCCESFULLY), icon=self._OK_ICON)
-            #
-            #             xbmc.executebuiltin('Container.Refresh')
-            #
-            #         else:
-            #             self.handlePyLoadErrorResponse(response)
-            #
-            # else:
-            #     self.handlePyLoadErrorResponse(response)
-
             if deletable or self._guiManager.MsgBoxYesNo(heading=self._t.getString(PYLOAD_QUESTION), message=self._t.getString(PYLOAD_DELETE_CONFIRMATION)):
                 response = self._api.deletePackage(pid=pid)
 
