@@ -280,9 +280,18 @@ class mail2pyload:
                             icon = self._ICON_STATUS_FINISHED
                             status = 'finished'
 
+                        if status != 'downloading':
+                            if any(link.get('status') == 12 for link in item.get('links', [])):
+                                icon = self._ICON_STATUS_DOWNLOADING
+                                status = 'downloading'
+
                         if any(link.get('status') == 8 for link in item.get('links', [])):
                             icon = self._ICON_STATUS_FAILED
                             status = 'failed'
+
+                        if any(link.get('status') == 9 for link in item.get('links', [])):
+                            icon = self._ICON_STATUS_ABORTED
+                            status = 'aborted'
 
                         plot = (f"[B]Progress[/B]: {progress}\n"
                                 f"[B]Status[/B]: {status}\n"
