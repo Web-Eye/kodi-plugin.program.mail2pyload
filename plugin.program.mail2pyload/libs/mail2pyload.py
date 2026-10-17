@@ -98,6 +98,7 @@ class mail2pyload:
         self._PYLOAD_PORT = int(addon.getSetting('pyload_port'))
         self._PYLOAD_USERNAME = addon.getSetting('pyload_username')
         self._PYLOAD_PASSWORD = addon.getSetting('pyload_password')
+        self._PYLOAD_API_KEY = addon.getSetting('pyload_api_key')
 
         self._DATABASE_HOST = addon.getSetting('database_host')
         self._DATABASE_PORT = int(addon.getSetting('database_port'))
@@ -107,7 +108,7 @@ class mail2pyload:
 
         self._REALDEBRIT_TOKEN = addon.getSetting('realdebrit_token')
 
-        self._api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_USERNAME, self._PYLOAD_PASSWORD)
+        self._api = pyloadAPI(self._PYLOAD_SERVER, self._PYLOAD_PORT, self._PYLOAD_API_KEY)
 
         self._db = None
         try:

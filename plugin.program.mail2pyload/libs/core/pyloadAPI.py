@@ -19,32 +19,29 @@ import requests
 
 class pyloadAPI:
 
-    def __init__(self, server, port, username, password):
+    def __init__(self, server, port, api_key):
 
         self._baseURL = f'http://{server}:{port}/api/'
         self._headers = {
-            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)'
+            'User-Agent': 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)',
+            'X-API-KEY': api_key
         }
         payload = {}
-        formdata = {
-            'username': (None, username),
-            'password': (None, password),
-        }
 
         self._session = requests.Session()
-        self._session.post(f'{self._baseURL}login', headers=self._headers, data=payload, files=formdata)
+        # self._session.post(f'{self._baseURL}login', headers=self._headers, data=payload)
 
     def getQueue(self):
-        return self._session.post(f'{self._baseURL}getQueue', headers=self._headers)
+        return self._session.get(f'{self._baseURL}getQueue', headers=self._headers)
 
     def getQueueData(self):
-        return self._session.post(f'{self._baseURL}getQueueData', headers=self._headers)
+        return self._session.get(f'{self._baseURL}getQueueData', headers=self._headers)
 
     def getCollector(self):
-        return self._session.post(f'{self._baseURL}getCollector', headers=self._headers)
+        return self._session.get(f'{self._baseURL}getCollector', headers=self._headers)
 
     def getCollectorData(self):
-        return self._session.post(f'{self._baseURL}getCollectorData', headers=self._headers)
+        return self._session.get(f'{self._baseURL}getCollectorData', headers=self._headers)
 
     def addPackage(self, name, link):
         data = {
@@ -95,14 +92,14 @@ class pyloadAPI:
             'package_id': pid
         }
         payload = {k: json.dumps(v) for k, v in data.items()}
-        return self._session.post(f'{self._baseURL}getPackageInfo', headers=self._headers, data=payload)
+        return self._session.get(f'{self._baseURL}getPackageInfo', headers=self._headers, data=payload)
 
     def getPackageData(self, pid):
         data = {
             'package_id': pid
         }
         payload = {k: json.dumps(v) for k, v in data.items()}
-        return self._session.post(f'{self._baseURL}getPackageData', headers=self._headers, data=payload)
+        return self._session.get(f'{self._baseURL}getPackageData', headers=self._headers, data=payload)
 
     def restartFile(self, fid):
         data = {

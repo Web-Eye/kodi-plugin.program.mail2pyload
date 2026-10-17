@@ -204,6 +204,10 @@ msgctxt "#30761"
 msgid "PYLOAD_PASSWORD"
 msgstr "pyLoad Password"
 
+msgctxt "#30771"
+msgid "PYLOAD_API_KEY"
+msgstr "pyLoad Api Key"
+
 msgctxt "#30781"
 msgid "PYLOAD_DEFAULT_PACKAGE_NAME"
 msgstr "Default Package Name"

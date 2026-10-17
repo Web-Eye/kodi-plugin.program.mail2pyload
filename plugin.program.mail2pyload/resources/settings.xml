@@ -88,6 +88,7 @@
                         <heading>30721</heading>
                     </control>
                 </setting>
+                <!--
                 <setting id="pyload_username" type="string" label="30741" help="">
                     <constraints>
                         <allowempty>true</allowempty>
@@ -103,6 +104,16 @@
                     </constraints>
                     <control type="edit" format="string">
                         <heading>30761</heading>
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
+                -->
+                <setting id="pyload_api_key" type="string" label="30771" help="">
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control type="edit" format="string">
+                        <heading>30771</heading>
                         <hidden>true</hidden>
                     </control>
                 </setting>
